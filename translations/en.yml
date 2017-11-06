@@ -1,0 +1,77 @@
+general:
+  create: Create
+  confirm: Confirm
+  cancel: Cancel
+landing:
+  create_account: Create account
+  built_by: Blabla
+  enter_email: Email
+  enter_password: Password
+  login: Login
+sign_up:
+  header: Let's get started
+  first_name: First name
+  last_name: Last name
+  email: Email
+  password: password
+  confirm_password: Confirm Password
+  cta: Create my account
+  created: Your account was successfully created
+  already_have_account: Already have an account?
+navigation:
+  rentals: Rentals
+  bookings: Bookings
+rental:
+  title: Rental
+  actions:
+    new_rental: New rental
+  messages:
+    created: Your rental was successfully created
+  columns:
+    name: Name
+    user: User
+    daily_rate: Daily rate (€)
+    actions: Actions
+  tips:
+    edit: Edit rental
+    delete: Delete rental
+    book: Book this rental
+  filter:
+    price_range: Price range
+    user: User
+booking:
+  title: Booking
+  columns:
+    rental: Rental
+    user: User
+    start_at: Start at
+    end_at: End at
+    days: Days
+    price: Price (€)
+  messages:
+    created: Your booking was successfully created
+    destroyed: 'Booking was successfully deleted'
+  tips:
+    edit: Edit booking
+    delete: Delete booking
+    book: Book this booking
+  filter:
+    date_filter:
+      title: Date filter
+      upcoming: Upcoming
+      expired: Expired
+      all: All
+    user: User
+errors:
+  default_notification_error: Something went wrong!
+flashes:
+  sure_to_delete: 'Are you sure you want to delete {model}?'
+  delete_success: '{model} was deleted successfully.'
+  rentals:
+    delete: Delete rental
+    the_rental: The rental
+  bookings:
+    delete: Delete booking
+    the_booking: The booking
+buttons:
+  cancel: Cancel

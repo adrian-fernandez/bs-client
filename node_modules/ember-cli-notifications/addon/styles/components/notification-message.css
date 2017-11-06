@@ -1,0 +1,157 @@
+/* Values */
+@value --icon-width: 30px;
+@value --icon-position: 10px;
+@value --icon-color: color(#fff a(.74));
+@value --icon-lighten-background: color(#fff a(.2));
+@value --countdown-lighten-background: color(#fff a(.4));
+@value --notification-max-height: 800px;
+@value --notification-border-radius: 3px;
+
+/* Colours */
+@value --red from '../addon';
+@value --blue from '../addon';
+@value --green from '../addon';
+@value --orange from '../addon';
+
+/* Spacing */
+@value --spacing-1 from '../addon';
+@value --spacing-2 from '../addon';
+
+/* Base */
+.c-notification {
+  display: flex;
+  align-items: stretch;
+  position: relative;
+  overflow: hidden;
+  border-radius: --notification-border-radius;
+  border-bottom: 1rem;
+  color: white;
+  max-height: --notification-max-height;
+  animation: notification-hide 250ms cubic-bezier(.33859, -.42, 1, -.22), notification-shrink 250ms 250ms cubic-bezier(.5, 0, 0, 1);
+  animation-fill-mode: forwards;
+  margin-bottom: --spacing-2;
+}
+
+.c-notification--clickable {
+  cursor: pointer;
+}
+
+.c-notification--in {
+  animation: notification-show 180ms cubic-bezier(.175, .885, .32, 1.27499);
+}
+
+.c-notification__content {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  justify-content: space-between;
+  padding: --spacing-1 --spacing-2;
+  word-break: break-word;
+
+  & a {
+    color: #fff;
+    text-decoration: underline;
+  }
+}
+
+.c-notification__icon {
+  padding: --spacing-1 0;
+  text-align: center;
+  flex: none;
+  background-color: --icon-lighten-background;
+  width: --icon-width;
+  color: --icon-color;
+}
+
+.c-notification__close {
+  margin-left: --spacing-2;
+  align-self: flex-start;
+  opacity: .74;
+  cursor: pointer;
+
+  &:hover,
+  &:focus {
+    opacity: 1;
+  }
+}
+
+.c-notification__countdown {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  background-color: --countdown-lighten-background;
+  width: 0;
+  height: 4px;
+  animation: notification-countdown linear 1;
+}
+
+/* Theme */
+.c-notification--info {
+  composes: c-notification;
+  background-color: --blue;
+}
+
+.c-notification--success {
+  composes: c-notification;
+  background-color: --green;
+}
+
+.c-notification--warning {
+  composes: c-notification;
+  background-color: --orange;
+}
+
+.c-notification--error {
+  composes: c-notification;
+  background-color: --red;
+}
+
+/* Keyframes */
+@keyframes notification-show {
+  0% {
+    opacity: 0;
+    transform: perspective(450px) translate(0, -30px) rotateX(90deg);
+  }
+
+  100% {
+    opacity: 1;
+    transform: perspective(450px) translate(0, 0) rotateX(0deg);
+  }
+}
+
+@keyframes notification-shrink {
+  0% {
+    opacity: 0;
+    max-height: --notification-max-height;
+    transform: scale(.8);
+  }
+
+  100% {
+    opacity: 0;
+    max-height: 0;
+    transform: scale(.8);
+  }
+}
+
+@keyframes notification-hide {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(.8);
+  }
+}
+
+@keyframes notification-countdown {
+  0% {
+    width: 100%;
+  }
+
+  100% {
+    width: 0%;
+  }
+}

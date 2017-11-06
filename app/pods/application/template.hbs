@@ -1,0 +1,11 @@
+<div class="container">
+  {{#if currentUser}}
+    {{x-navigation currentPath=currentPath invalidateSession=(action 'invalidateSession')}}
+  {{/if}}
+
+  {{notification-container}}
+  <main class="main" role="main">
+    {{outlet}}
+    {{outlet 'modal'}}
+  </main>
+</div>

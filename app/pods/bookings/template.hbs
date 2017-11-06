@@ -1,0 +1,84 @@
+<div class="row filters">
+  <div class="col-md-2">
+    {{input value=rentalFilter placeholder='Rental'}}
+  </div>
+
+  {{#if (can 'see user booking')}}
+    <div class="col-md-3">
+    {{#power-select options=allUsersExceptMe
+                    selected=userFilterObj
+                    allowClear=true
+                    placeholder=(t 'booking.filter.user')
+                    onchange=(action 'selectUserFilter') as |user|}}
+      {{user.email}}
+    {{/power-select}}
+    </div>
+  {{/if}}
+
+  <div class="col-md-2">
+    {{#power-select options=availableDateFilters
+                    selected=dateFilter
+                    placeholder=(t 'booking.filter.date_filter.title')
+                    onchange=(action (mut dateFilter)) as |filter|}}
+      {{t (concat 'booking.filter.date_filter.' filter)}}
+    {{/power-select}}
+  </div>
+
+  <div class="col-md-2">
+    {{date-picker value=from placeholder='From' action='setFromDate' clearBtn=true}}
+  </div>
+
+  <div class="col-md-2">
+    {{date-picker value=to placeholder='To' action='setToDate' clearBtn=true}}
+  </div>
+</div>
+
+{{#x-table columns=availableColumns
+           sortableFields=availableColumns
+           modelName='booking'
+           showActionsColumn=true
+           sortField=sortField
+           sortDirection=sortDirection}}
+  {{#each bookings as |booking|}}
+    <tr class="{{if booking.hasEnded 'ended-booking' ''}} {{if booking.isNow 'active-booking' ''}}">
+      <td>
+        {{booking.rental.name}}
+      </td>
+
+      {{#if (can 'see user booking')}}
+        <td>
+          {{booking.user.email}}
+        </td>
+      {{/if}}
+
+      <td>
+        {{format-date booking.start_at locale='fr'}}
+      </td>
+
+      <td>
+        {{format-date booking.end_at locale='fr'}}
+      </td>
+
+      <td>
+        {{booking.days}}
+      </td>
+
+      <td>
+        {{format-money booking.price}}
+      </td>
+
+      <td>
+        {{#if (can 'edit booking' booking)}}
+          {{#link-to "bookings.edit" booking}}{{fa-icon 'pencil'}}{{/link-to}}
+        {{/if}}
+
+        {{#if (can 'delete booking' booking)}}
+          <a href='#' {{action 'delete' booking}} title={{t 'booking.tips.delete'}}>{{fa-icon 'remove'}}</a>
+        {{/if}}
+      </td>
+    </tr>
+  {{/each}}
+{{/x-table}}
+{{x-paginator content=rentals changePage=(action (mut page)) page=page}}
+
+{{outlet}}

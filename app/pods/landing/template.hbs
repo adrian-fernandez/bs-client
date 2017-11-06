@@ -1,0 +1,15 @@
+<div class="auth int-landing-auth">
+  <div class="auth-form">
+    <div class="auth-center">
+      <h2>Welcome</h2>
+
+      {{#if errorMessage}}
+        <div class="flash flash-danger">
+          {{errorMessage}}
+        </div>
+      {{/if}}
+
+      {{x-login-form authenticate='authenticate' identification=identification password=password}}
+    </div>
+  </div>
+</div>

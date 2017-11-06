@@ -1,0 +1,17 @@
+{{#modal-dialog
+    close='cancel'
+    translucentOverlay=true
+    targetAttachment='center'
+    hasOverlay=false
+}}
+  <div class="modal-body is-header">
+    <h4>{{titleText}}</h4>
+    <p>{{{bodyText}}}</p>
+  </div>
+  <div class="modal-footer">
+    <button {{action "cancel"}} type="button" class="btn btn-default int-modal-cancel-btn" data-dismiss="modal">{{t 'buttons.cancel'}}</button>
+    {{#unless submitDisabled}}
+      <button {{action "submit"}} type="button" class="btn btn-danger int-modal-delete-btn" data-dismiss="modal">{{submitButtonText}}</button>
+    {{/unless}}
+  </div>
+{{/modal-dialog}}

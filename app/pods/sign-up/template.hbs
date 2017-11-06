@@ -1,0 +1,37 @@
+<div class="auth">
+  <div class="auth-form int-sign-up-form">
+    <div class="auth-center">
+      <h2>{{t 'sign_up.header'}}</h2>
+
+      <div class="form-item">
+        {{input type="email" placeholder=(t 'sign_up.email') value=model.email enter='signup'}}
+      </div>
+
+      <div class="form-item">
+        {{input type="password" placeholder=(t 'sign_up.password') value=model.password enter='signup'}}
+      </div>
+
+      <div class="form-item">
+        {{input type="password" placeholder=(t 'sign_up.confirm_password') value=model.passwordConfirmation enter='signup'}}
+      </div>
+
+      <div class="auth-actions">
+        <a class="button button-outline button-block int-sign-up-button" {{action 'signup'}}>
+          {{t 'sign_up.cta'}} <span class="ion-android-arrow-forward"></span>
+        </a>
+        {{#link-to 'landing' class="auth-forgot"}}
+          {{t 'sign_up.already_have_account'}}
+          {{t 'landing.login'}}
+        {{/link-to}}
+      </div>
+    </div>
+
+    <ul class="auth-links">
+      <li>{{t 'landing.built_by'}}</li>
+      <li><a href="#" title="{{t 'landing.terms_conds'}}" {{action 'toggleTerms'}}>{{t 'landing.terms_conds'}}</a></li>
+      <li><a href="#" title="{{t 'landing.privacy_policy'}}" {{action 'togglePrivacyPolicy'}}>{{t 'landing.privacy_policy'}}</a></li>
+      <li>{{client.address}}</li>
+      <li>{{client.vat}}</li>
+    </ul>
+  </div>
+</div>

@@ -1,0 +1,57 @@
+<nav class="navbar navbar-default" role="navigation">
+  <!-- Brand and toggle get grouped for better mobile display -->
+  <div class="navbar-header">
+    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+      <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
+    </button>
+    <a class="navbar-brand" href="http://bs-client.herokuapp.com">Adrian - BookingSync</a>
+  </div>
+
+  <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+    <ul class="nav navbar-nav">
+      <li>
+        {{#link-to 'rentals'}}
+          <span class="glyphicon glyphicon-home"></span>Rentals list
+        {{/link-to}}
+      </li>
+
+      <li>
+        {{#link-to 'bookings'}}
+          <span class="glyphicon glyphicon-shopping-cart"></span>Bookings list
+        {{/link-to}}
+      </li>
+
+      {{#bs-dropdown tagName="li"}}
+        {{#bs-dropdown-toggle}}
+          <span class="glyphicon glyphicon-wrench"></span>Actions <span class="caret"></span>
+        {{/bs-dropdown-toggle}}
+        {{#bs-dropdown-menu}}
+          <li>
+            {{#link-to 'rentals.new'}}
+              New rental
+            {{/link-to}}
+          </li>
+          <li>
+            {{#link-to 'rentals'}}
+              Upload CSV
+            {{/link-to}}
+          </li>
+        {{/bs-dropdown-menu}}
+      {{/bs-dropdown}}
+    </ul>
+
+    <ul class="nav navbar-nav navbar-right">
+      {{#bs-dropdown tagName="li"}}
+        {{#bs-dropdown-toggle}}
+         <span class="glyphicon glyphicon-user"></span>{{userEmail}} <span class="caret"></span>
+        {{/bs-dropdown-toggle}}
+
+        {{#bs-dropdown-menu}}
+          <li>
+            <a href="#" {{action 'invalidateSession'}}><span class="glyphicon glyphicon-off"></span>Logout</a>
+          </li>
+        {{/bs-dropdown-menu}}
+      {{/bs-dropdown}}
+    </ul>
+  </div>
+</nav>

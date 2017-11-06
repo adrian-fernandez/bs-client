@@ -1,0 +1,92 @@
+{{#if (can 'create rental')}}
+  <div class="row-fluid">
+    <div class="pull-right action-buttons-div">
+      {{#link-to 'rentals.new' class='btn btn-info'}}{{t 'rental.actions.new_rental'}}{{/link-to}}
+    </div>
+  </div>
+{{/if}}
+
+<div class="row-fluid filters">
+  <div class="col-md-2">
+    {{input value=rentalFilter placeholder='Rental'}}
+  </div>
+
+  {{#if (can 'see user booking')}}
+    <div class="col-md-3">
+    {{#power-select options=allUsersExceptMe
+                    selected=userFilterObj
+                    allowClear=true
+                    placeholder=(t 'rental.filter.user')
+                    onchange=(action 'selectUserFilter') as |user|}}
+      {{user.email}}
+    {{/power-select}}
+    </div>
+  {{/if}}
+
+  <div class="col-md-5">
+    <div class="col-md-3">
+      <span>{{t 'rental.filter.price_range'}}</span>
+    </div>
+    <div class="col-md-8">
+      {{range-slider
+        value=defaultPriceRange
+        mood='success'
+        changed='priceFilterChange'
+        tooltip='show'
+        tooltipPosition='top'
+        min=0
+        step=1
+        max=defaultMaxDailyRate }}
+      </div>
+  </div>
+</div>
+
+{{#x-table columns=availableColumns
+           sortableFields=availableColumns
+           modelName='rental'
+           sortField=sortField
+           sortDirection=sortDirection}}
+  {{#if rentals.isPending}}
+    {{x-loading}}
+  {{else}}
+    {{#each rentals as |rental|}}
+      <tr>
+        <td>
+          {{rental.name}}
+        </td>
+
+        {{#if canShowToAdmin}}
+          <td>
+            {{rental.user.email}}
+          </td>
+        {{/if}}
+
+        <td>
+          {{format-money rental.dailyRate}}
+        </td>
+
+        <td>
+          {{#if (can 'book rental' rental)}}
+            <a href='#' {{action 'book' rental}} title={{t 'rental.tips.book'}}>{{fa-icon 'shopping-cart'}}</a>
+          {{/if}}
+
+          {{#if (can 'edit rental' rental)}}
+            {{#link-to "rentals.edit" rental}}{{fa-icon 'pencil'}}{{/link-to}}
+          {{/if}}
+
+          {{#if (can 'delete rental' rental)}}
+            <a href='#' {{action 'delete' rental}} title={{t 'rental.tips.delete'}}>{{fa-icon 'remove'}}</a>
+          {{/if}}
+        </td>
+      </tr>
+    {{/each}}
+  {{/if}}
+{{/x-table}}
+
+{{x-paginator content=rentals changePage=(action (mut page)) page=page}}
+
+{{#if isShowingBookingModal}}
+  {{x-booking-rental rental=selectedRental isShowingBookingModal=isShowingBookingModal}}
+{{/if}}
+
+{{outlet}}

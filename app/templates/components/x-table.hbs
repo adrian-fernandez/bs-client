@@ -1,0 +1,22 @@
+<thead>
+  <tr>
+    {{#each columns as |column|}}
+      <th class={{thClass}}>
+      {{#if (array-contains sortableFields column)}}
+        <a href='#' {{action 'setSort' column}} class={{if (eq column sortField) sortedClass noSortedClass}}>
+          <span>{{t (concat translationsRoot column)}}</span>
+          {{fa-icon (sort-icon column sortField sortDirection)}}
+        </a>
+      {{else}}
+        <span>{{t (concat translationsRoot column)}}</span>
+      {{/if}}
+      </th>
+    {{/each}}
+    {{#if showActionsColumn}}
+      <th class={{thClass}}></th>
+    {{/if}}
+  </tr>
+</thead>
+<tbody>
+  {{yield}}
+</tbody>

@@ -64,6 +64,10 @@ define('bs-client/abilities/rental', ['exports', 'bs-client/abilities/generic'],
       return this.get('currentUser');
     }),
 
+    canEdit: Ember.computed('model.user', 'currentUser.isAdmin', function () {
+      return this.get('currentUser.isAdmin') || this.get('model.user.id') === this.get('currentUser.user.id');
+    }),
+
     canBook: Ember.computed('model.user', 'currentUser.isAdmin', function () {
       return !this.get('currentUser.isAdmin') && this.get('model.user.id') !== this.get('currentUser.user.id');
     }),
@@ -111,8 +115,6 @@ define('bs-client/app', ['exports', 'bs-client/resolver', 'ember-load-initialize
   });
 
 
-  Ember.MODEL_FACTORY_INJECTIONS = true;
-
   var App = Ember.Application.extend({
     modulePrefix: _environment.default.modulePrefix,
     podModulePrefix: _environment.default.podModulePrefix,
@@ -129,7 +131,8 @@ define('bs-client/authenticators/bs-token', ['exports', 'ember-simple-auth/authe
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  var RSVP = Ember.RSVP;
+  var RSVP = Ember.RSVP,
+      isEmpty = Ember.isEmpty;
   exports.default = _base.default.extend({
     restore: function restore(data) {
       return new RSVP.Promise(function (resolve, reject) {
@@ -216,7 +219,7 @@ define("bs-client/cldrs/en", ["exports"], function (exports) {
           t0 = Number(s[0]) == n,
           n10 = t0 && s[0].slice(-1),
           n100 = t0 && s[0].slice(-2);if (ord) return n10 == 1 && n100 != 11 ? "one" : n10 == 2 && n100 != 12 ? "two" : n10 == 3 && n100 != 13 ? "few" : "other";return n == 1 && v0 ? "one" : "other";
-    }, "fields": { "year": { "displayName": "year", "relative": { "0": "this year", "1": "next year", "-1": "last year" }, "relativeTime": { "future": { "one": "in {0} year", "other": "in {0} years" }, "past": { "one": "{0} year ago", "other": "{0} years ago" } } }, "month": { "displayName": "month", "relative": { "0": "this month", "1": "next month", "-1": "last month" }, "relativeTime": { "future": { "one": "in {0} month", "other": "in {0} months" }, "past": { "one": "{0} month ago", "other": "{0} months ago" } } }, "day": { "displayName": "day", "relative": { "0": "today", "1": "tomorrow", "-1": "yesterday" }, "relativeTime": { "future": { "one": "in {0} day", "other": "in {0} days" }, "past": { "one": "{0} day ago", "other": "{0} days ago" } } }, "hour": { "displayName": "hour", "relativeTime": { "future": { "one": "in {0} hour", "other": "in {0} hours" }, "past": { "one": "{0} hour ago", "other": "{0} hours ago" } } }, "minute": { "displayName": "minute", "relativeTime": { "future": { "one": "in {0} minute", "other": "in {0} minutes" }, "past": { "one": "{0} minute ago", "other": "{0} minutes ago" } } }, "second": { "displayName": "second", "relative": { "0": "now" }, "relativeTime": { "future": { "one": "in {0} second", "other": "in {0} seconds" }, "past": { "one": "{0} second ago", "other": "{0} seconds ago" } } } } }];
+    }, "fields": { "year": { "displayName": "year", "relative": { "0": "this year", "1": "next year", "-1": "last year" }, "relativeTime": { "future": { "one": "in {0} year", "other": "in {0} years" }, "past": { "one": "{0} year ago", "other": "{0} years ago" } } }, "month": { "displayName": "month", "relative": { "0": "this month", "1": "next month", "-1": "last month" }, "relativeTime": { "future": { "one": "in {0} month", "other": "in {0} months" }, "past": { "one": "{0} month ago", "other": "{0} months ago" } } }, "day": { "displayName": "day", "relative": { "0": "today", "1": "tomorrow", "-1": "yesterday" }, "relativeTime": { "future": { "one": "in {0} day", "other": "in {0} days" }, "past": { "one": "{0} day ago", "other": "{0} days ago" } } }, "hour": { "displayName": "hour", "relativeTime": { "future": { "one": "in {0} hour", "other": "in {0} hours" }, "past": { "one": "{0} hour ago", "other": "{0} hours ago" } } }, "minute": { "displayName": "minute", "relativeTime": { "future": { "one": "in {0} minute", "other": "in {0} minutes" }, "past": { "one": "{0} minute ago", "other": "{0} minutes ago" } } }, "second": { "displayName": "second", "relative": { "0": "now" }, "relativeTime": { "future": { "one": "in {0} second", "other": "in {0} seconds" }, "past": { "one": "{0} second ago", "other": "{0} seconds ago" } } } } }, { "locale": "en-US", "parentLocale": "en" }];
 });
 define('bs-client/components/basic-dropdown', ['exports', 'ember-basic-dropdown/components/basic-dropdown'], function (exports, _basicDropdown) {
   'use strict';
@@ -833,6 +836,71 @@ define('bs-client/components/ember-modal-dialog-positioned-container', ['exports
     }
   });
 });
+define('bs-client/components/ember-modal-dialog/-basic-dialog', ['exports', 'ember-modal-dialog/components/basic-dialog'], function (exports, _basicDialog) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _basicDialog.default;
+    }
+  });
+});
+define('bs-client/components/ember-modal-dialog/-in-place-dialog', ['exports', 'ember-modal-dialog/components/in-place-dialog'], function (exports, _inPlaceDialog) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _inPlaceDialog.default;
+    }
+  });
+});
+define('bs-client/components/ember-modal-dialog/-liquid-dialog', ['exports', 'ember-modal-dialog/components/liquid-dialog'], function (exports, _liquidDialog) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _liquidDialog.default;
+    }
+  });
+});
+define('bs-client/components/ember-modal-dialog/-liquid-tether-dialog', ['exports', 'ember-modal-dialog/components/liquid-tether-dialog'], function (exports, _liquidTetherDialog) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _liquidTetherDialog.default;
+    }
+  });
+});
+define('bs-client/components/ember-modal-dialog/-tether-dialog', ['exports', 'ember-modal-dialog/components/tether-dialog'], function (exports, _tetherDialog) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _tetherDialog.default;
+    }
+  });
+});
 define('bs-client/components/ember-wormhole', ['exports', 'ember-wormhole/components/ember-wormhole'], function (exports, _emberWormhole) {
   'use strict';
 
@@ -1167,7 +1235,7 @@ define('bs-client/components/star-rating', ['exports', 'ember-star-rating/compon
     }
   });
 });
-define('bs-client/components/tether-dialog', ['exports', 'ember-modal-dialog/components/tether-dialog'], function (exports, _tetherDialog) {
+define('bs-client/components/tether-dialog', ['exports', 'ember-modal-dialog/components/deprecated-tether-dialog'], function (exports, _deprecatedTetherDialog) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -1176,7 +1244,7 @@ define('bs-client/components/tether-dialog', ['exports', 'ember-modal-dialog/com
   Object.defineProperty(exports, 'default', {
     enumerable: true,
     get: function () {
-      return _tetherDialog.default;
+      return _deprecatedTetherDialog.default;
     }
   });
 });
@@ -1257,13 +1325,17 @@ define('bs-client/components/x-loading', ['exports'], function (exports) {
     })
   });
 });
-define('bs-client/components/x-login-form', ['exports'], function (exports) {
+define('bs-client/components/x-login-form', ['exports', 'bs-client/config/environment'], function (exports, _environment) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
   exports.default = Ember.Component.extend({
+    abc: Ember.computed(function () {
+      return 'a ' + _environment.default.BACKEND_URL + ' b';
+    }),
+
     actions: {
       authenticate: function authenticate() {
         this.sendAction('authenticate');
@@ -1702,7 +1774,7 @@ define('bs-client/helpers/cancel-all', ['exports', 'ember-concurrency/-helpers']
       Ember.assert('The first argument passed to the `cancel-all` helper should be a Task or TaskGroup (without quotes); you passed ' + cancelable, false);
     }
 
-    return (0, _helpers.taskHelperClosure)('cancelAll', [cancelable, CANCEL_REASON]);
+    return (0, _helpers.taskHelperClosure)('cancel-all', 'cancelAll', [cancelable, CANCEL_REASON]);
   }
 
   exports.default = Ember.Helper.helper(cancelHelper);
@@ -2103,18 +2175,13 @@ define('bs-client/helpers/format-money', ['exports', 'accounting/helpers/format-
   });
   exports.default = _formatMoney.default;
 });
-define('bs-client/helpers/format-number', ['exports', 'ember-intl/helpers/format-number'], function (exports, _formatNumber) {
+define('bs-client/helpers/format-number', ['exports', 'accounting/helpers/format-number'], function (exports, _formatNumber) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  Object.defineProperty(exports, 'default', {
-    enumerable: true,
-    get: function () {
-      return _formatNumber.default;
-    }
-  });
+  exports.default = _formatNumber.default;
 });
 define('bs-client/helpers/format-relative', ['exports', 'ember-intl/helpers/format-relative'], function (exports, _formatRelative) {
   'use strict';
@@ -2273,6 +2340,25 @@ define('bs-client/helpers/humanize', ['exports', 'ember-cli-string-helpers/helpe
     }
   });
 });
+define('bs-client/helpers/ignore-children', ['exports', 'ember-ignore-children-helper/helpers/ignore-children'], function (exports, _ignoreChildren) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _ignoreChildren.default;
+    }
+  });
+  Object.defineProperty(exports, 'ignoreChildren', {
+    enumerable: true,
+    get: function () {
+      return _ignoreChildren.ignoreChildren;
+    }
+  });
+});
 define('bs-client/helpers/inc', ['exports', 'ember-composable-helpers/helpers/inc'], function (exports, _inc) {
   'use strict';
 
@@ -2343,14 +2429,17 @@ define('bs-client/helpers/invoke', ['exports', 'ember-composable-helpers/helpers
     }
   });
 });
-define('bs-client/helpers/is-after', ['exports', 'bs-client/config/environment', 'ember-moment/helpers/is-after'], function (exports, _environment, _isAfter) {
+define('bs-client/helpers/is-after', ['exports', 'ember-moment/helpers/is-after'], function (exports, _isAfter) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = _isAfter.default.extend({
-    globalAllowEmpty: !!Ember.get(_environment.default, 'moment.allowEmpty')
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _isAfter.default;
+    }
   });
 });
 define('bs-client/helpers/is-array', ['exports', 'ember-truth-helpers/helpers/is-array'], function (exports, _isArray) {
@@ -2371,24 +2460,30 @@ define('bs-client/helpers/is-array', ['exports', 'ember-truth-helpers/helpers/is
 
   exports.default = forExport;
 });
-define('bs-client/helpers/is-before', ['exports', 'bs-client/config/environment', 'ember-moment/helpers/is-before'], function (exports, _environment, _isBefore) {
+define('bs-client/helpers/is-before', ['exports', 'ember-moment/helpers/is-before'], function (exports, _isBefore) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = _isBefore.default.extend({
-    globalAllowEmpty: !!Ember.get(_environment.default, 'moment.allowEmpty')
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _isBefore.default;
+    }
   });
 });
-define('bs-client/helpers/is-between', ['exports', 'bs-client/config/environment', 'ember-moment/helpers/is-between'], function (exports, _environment, _isBetween) {
+define('bs-client/helpers/is-between', ['exports', 'ember-moment/helpers/is-between'], function (exports, _isBetween) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = _isBetween.default.extend({
-    globalAllowEmpty: !!Ember.get(_environment.default, 'moment.allowEmpty')
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _isBetween.default;
+    }
   });
 });
 define('bs-client/helpers/is-clipboard-supported', ['exports', 'ember-cli-clipboard/helpers/is-clipboard-supported'], function (exports, _isClipboardSupported) {
@@ -2429,34 +2524,43 @@ define('bs-client/helpers/is-equal', ['exports', 'ember-truth-helpers/helpers/is
     }
   });
 });
-define('bs-client/helpers/is-same-or-after', ['exports', 'bs-client/config/environment', 'ember-moment/helpers/is-same-or-after'], function (exports, _environment, _isSameOrAfter) {
+define('bs-client/helpers/is-same-or-after', ['exports', 'ember-moment/helpers/is-same-or-after'], function (exports, _isSameOrAfter) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = _isSameOrAfter.default.extend({
-    globalAllowEmpty: !!Ember.get(_environment.default, 'moment.allowEmpty')
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _isSameOrAfter.default;
+    }
   });
 });
-define('bs-client/helpers/is-same-or-before', ['exports', 'bs-client/config/environment', 'ember-moment/helpers/is-same-or-before'], function (exports, _environment, _isSameOrBefore) {
+define('bs-client/helpers/is-same-or-before', ['exports', 'ember-moment/helpers/is-same-or-before'], function (exports, _isSameOrBefore) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = _isSameOrBefore.default.extend({
-    globalAllowEmpty: !!Ember.get(_environment.default, 'moment.allowEmpty')
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _isSameOrBefore.default;
+    }
   });
 });
-define('bs-client/helpers/is-same', ['exports', 'bs-client/config/environment', 'ember-moment/helpers/is-same'], function (exports, _environment, _isSame) {
+define('bs-client/helpers/is-same', ['exports', 'ember-moment/helpers/is-same'], function (exports, _isSame) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = _isSame.default.extend({
-    globalAllowEmpty: !!Ember.get(_environment.default, 'moment.allowEmpty')
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _isSame.default;
+    }
   });
 });
 define('bs-client/helpers/join', ['exports', 'ember-composable-helpers/helpers/join'], function (exports, _join) {
@@ -2603,34 +2707,43 @@ define('bs-client/helpers/map', ['exports', 'ember-composable-helpers/helpers/ma
     }
   });
 });
-define('bs-client/helpers/moment-add', ['exports', 'bs-client/config/environment', 'ember-moment/helpers/moment-add'], function (exports, _environment, _momentAdd) {
+define('bs-client/helpers/moment-add', ['exports', 'ember-moment/helpers/moment-add'], function (exports, _momentAdd) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = _momentAdd.default.extend({
-    globalAllowEmpty: !!Ember.get(_environment.default, 'moment.allowEmpty')
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _momentAdd.default;
+    }
   });
 });
-define('bs-client/helpers/moment-calendar', ['exports', 'bs-client/config/environment', 'ember-moment/helpers/moment-calendar'], function (exports, _environment, _momentCalendar) {
+define('bs-client/helpers/moment-calendar', ['exports', 'ember-moment/helpers/moment-calendar'], function (exports, _momentCalendar) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = _momentCalendar.default.extend({
-    globalAllowEmpty: !!Ember.get(_environment.default, 'moment.allowEmpty')
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _momentCalendar.default;
+    }
   });
 });
-define('bs-client/helpers/moment-diff', ['exports', 'bs-client/config/environment', 'ember-moment/helpers/moment-diff'], function (exports, _environment, _momentDiff) {
+define('bs-client/helpers/moment-diff', ['exports', 'ember-moment/helpers/moment-diff'], function (exports, _momentDiff) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = _momentDiff.default.extend({
-    globalAllowEmpty: !!Ember.get(_environment.default, 'moment.allowEmpty')
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _momentDiff.default;
+    }
   });
 });
 define('bs-client/helpers/moment-duration', ['exports', 'ember-moment/helpers/moment-duration'], function (exports, _momentDuration) {
@@ -2646,74 +2759,95 @@ define('bs-client/helpers/moment-duration', ['exports', 'ember-moment/helpers/mo
     }
   });
 });
-define('bs-client/helpers/moment-format', ['exports', 'bs-client/config/environment', 'ember-moment/helpers/moment-format'], function (exports, _environment, _momentFormat) {
+define('bs-client/helpers/moment-format', ['exports', 'ember-moment/helpers/moment-format'], function (exports, _momentFormat) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = _momentFormat.default.extend({
-    globalAllowEmpty: !!Ember.get(_environment.default, 'moment.allowEmpty')
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _momentFormat.default;
+    }
   });
 });
-define('bs-client/helpers/moment-from-now', ['exports', 'bs-client/config/environment', 'ember-moment/helpers/moment-from-now'], function (exports, _environment, _momentFromNow) {
+define('bs-client/helpers/moment-from-now', ['exports', 'ember-moment/helpers/moment-from-now'], function (exports, _momentFromNow) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = _momentFromNow.default.extend({
-    globalAllowEmpty: !!Ember.get(_environment.default, 'moment.allowEmpty')
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _momentFromNow.default;
+    }
   });
 });
-define('bs-client/helpers/moment-from', ['exports', 'bs-client/config/environment', 'ember-moment/helpers/moment-from'], function (exports, _environment, _momentFrom) {
+define('bs-client/helpers/moment-from', ['exports', 'ember-moment/helpers/moment-from'], function (exports, _momentFrom) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = _momentFrom.default.extend({
-    globalAllowEmpty: !!Ember.get(_environment.default, 'moment.allowEmpty')
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _momentFrom.default;
+    }
   });
 });
-define('bs-client/helpers/moment-subtract', ['exports', 'bs-client/config/environment', 'ember-moment/helpers/moment-subtract'], function (exports, _environment, _momentSubtract) {
+define('bs-client/helpers/moment-subtract', ['exports', 'ember-moment/helpers/moment-subtract'], function (exports, _momentSubtract) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = _momentSubtract.default.extend({
-    globalAllowEmpty: !!Ember.get(_environment.default, 'moment.allowEmpty')
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _momentSubtract.default;
+    }
   });
 });
-define('bs-client/helpers/moment-to-date', ['exports', 'bs-client/config/environment', 'ember-moment/helpers/moment-to-date'], function (exports, _environment, _momentToDate) {
+define('bs-client/helpers/moment-to-date', ['exports', 'ember-moment/helpers/moment-to-date'], function (exports, _momentToDate) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = _momentToDate.default.extend({
-    globalAllowEmpty: !!Ember.get(_environment.default, 'moment.allowEmpty')
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _momentToDate.default;
+    }
   });
 });
-define('bs-client/helpers/moment-to-now', ['exports', 'bs-client/config/environment', 'ember-moment/helpers/moment-to-now'], function (exports, _environment, _momentToNow) {
+define('bs-client/helpers/moment-to-now', ['exports', 'ember-moment/helpers/moment-to-now'], function (exports, _momentToNow) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = _momentToNow.default.extend({
-    globalAllowEmpty: !!Ember.get(_environment.default, 'moment.allowEmpty')
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _momentToNow.default;
+    }
   });
 });
-define('bs-client/helpers/moment-to', ['exports', 'bs-client/config/environment', 'ember-moment/helpers/moment-to'], function (exports, _environment, _momentTo) {
+define('bs-client/helpers/moment-to', ['exports', 'ember-moment/helpers/moment-to'], function (exports, _momentTo) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = _momentTo.default.extend({
-    globalAllowEmpty: !!Ember.get(_environment.default, 'moment.allowEmpty')
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _momentTo.default;
+    }
   });
 });
 define('bs-client/helpers/moment-unix', ['exports', 'ember-moment/helpers/unix'], function (exports, _unix) {
@@ -2880,7 +3014,7 @@ define('bs-client/helpers/perform', ['exports', 'ember-concurrency/-helpers'], f
   });
   exports.performHelper = performHelper;
   function performHelper(args, hash) {
-    return (0, _helpers.taskHelperClosure)('perform', args, hash);
+    return (0, _helpers.taskHelperClosure)('perform', 'perform', args, hash);
   }
 
   exports.default = Ember.Helper.helper(performHelper);
@@ -3142,7 +3276,6 @@ define('bs-client/helpers/sort-icon', ['exports'], function (exports) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.sortIcon = sortIcon;
 
   var _slicedToArray = function () {
     function sliceIterator(arr, i) {
@@ -3182,7 +3315,7 @@ define('bs-client/helpers/sort-icon', ['exports'], function (exports) {
     };
   }();
 
-  function sortIcon(_ref) {
+  exports.default = Ember.Helper.helper(function (_ref) {
     var _ref2 = _slicedToArray(_ref, 3),
         column = _ref2[0],
         sortField = _ref2[1],
@@ -3197,9 +3330,7 @@ define('bs-client/helpers/sort-icon', ['exports'], function (exports) {
         return 'angle-down';
       }
     }
-  }
-
-  exports.default = Ember.Helper.helper(sortIcon);
+  });
 });
 define('bs-client/helpers/t-html', ['exports', 'ember-intl/helpers/format-html-message'], function (exports, _formatHtmlMessage) {
   'use strict';
@@ -3598,6 +3729,54 @@ define('bs-client/initializers/data-adapter', ['exports'], function (exports) {
     before: 'store',
     initialize: function initialize() {}
   };
+});
+define('bs-client/initializers/ember-cli-mirage', ['exports', 'ember-cli-mirage/utils/read-modules', 'bs-client/config/environment', 'bs-client/mirage/config', 'ember-cli-mirage/server', 'lodash/assign'], function (exports, _readModules, _environment, _config, _server, _assign2) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.startMirage = startMirage;
+  var getWithDefault = Ember.getWithDefault;
+  exports.default = {
+    name: 'ember-cli-mirage',
+    initialize: function initialize() {
+      if (_shouldUseMirage(_environment.default.environment, _environment.default['ember-cli-mirage'])) {
+        startMirage(_environment.default);
+      }
+    }
+  };
+  function startMirage() {
+    var env = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _environment.default;
+
+    var environment = env.environment;
+    var discoverEmberDataModels = getWithDefault(env['ember-cli-mirage'] || {}, 'discoverEmberDataModels', true);
+    var modules = (0, _readModules.default)(env.modulePrefix);
+    var options = (0, _assign2.default)(modules, { environment: environment, baseConfig: _config.default, testConfig: _config.testConfig, discoverEmberDataModels: discoverEmberDataModels });
+
+    return new _server.default(options);
+  }
+
+  function _shouldUseMirage(env, addonConfig) {
+    if (typeof FastBoot !== 'undefined') {
+      return false;
+    }
+    var userDeclaredEnabled = typeof addonConfig.enabled !== 'undefined';
+    var defaultEnabled = _defaultEnabled(env, addonConfig);
+
+    return userDeclaredEnabled ? addonConfig.enabled : defaultEnabled;
+  }
+
+  /*
+    Returns a boolean specifying the default behavior for whether
+    to initialize Mirage.
+  */
+  function _defaultEnabled(env, addonConfig) {
+    var usingInDev = env === 'development' && !addonConfig.usingProxy;
+    var usingInTest = env === 'test';
+
+    return usingInDev || usingInTest;
+  }
 });
 define('bs-client/initializers/ember-concurrency', ['exports', 'ember-concurrency'], function (exports) {
   'use strict';
@@ -4130,18 +4309,173 @@ define('bs-client/lib/cookie', ['exports'], function (exports) {
     }
   });
 });
-define('bs-client/mixins/adapter-fetch', ['exports', 'ember-fetch/mixins/adapter-fetch'], function (exports, _adapterFetch) {
+define('bs-client/mirage/config', ['exports', 'bs-client/config/environment'], function (exports, _environment) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  Object.defineProperty(exports, 'default', {
-    enumerable: true,
-    get: function () {
-      return _adapterFetch.default;
+
+  exports.default = function () {
+    this.urlPrefix = _environment.default.BACKEND_URL;
+    this.urlPrefix = 'http://localhost:3000';
+    this.namespace = '/api/v1';
+
+    this.get('/users/me');
+
+    this.post('/user_sessions.json', function () {
+      return { errors: [] };
+    });
+
+    this.get('/rentals/rental_daily_rate_ranges', function () {
+      return { rental_statistics: { max_daily_rate: 10, min_daily_rate: 1 } };
+    });
+  };
+});
+define('bs-client/mirage/factories/booking', ['exports', 'ember-cli-mirage', 'moment'], function (exports, _emberCliMirage, _moment) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = _emberCliMirage.Factory.extend({
+    name: function name(i) {
+      return 'rental_' + i;
+    },
+    dailyRate: function dailyRate(i) {
+      return i + 1;
+    },
+    user: (0, _emberCliMirage.association)(),
+    rental: (0, _emberCliMirage.association)(),
+
+    hasStarted: function hasStarted() {
+      return (0, _moment.default)(this.startAt) <= (0, _moment.default)(new Date());
     }
   });
+});
+define('bs-client/mirage/factories/rental', ['exports', 'ember-cli-mirage'], function (exports, _emberCliMirage) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = _emberCliMirage.Factory.extend({
+    name: function name(i) {
+      return 'rental_' + i;
+    },
+    dailyRate: function dailyRate(i) {
+      return i + 1;
+    },
+    user: (0, _emberCliMirage.association)()
+  });
+});
+define('bs-client/mirage/factories/user', ['exports', 'ember-cli-mirage'], function (exports, _emberCliMirage) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = _emberCliMirage.Factory.extend({
+    password: function password(i) {
+      return 'password_' + i;
+    },
+    passwordConfirmation: function passwordConfirmation(i) {
+      return 'password_' + i;
+    },
+    email: function email(i) {
+      return 'email_' + i + '@example.com';
+    },
+
+    adminUser: (0, _emberCliMirage.trait)({
+      admin: true,
+      isAdmin: true
+    }),
+
+    normalUser: (0, _emberCliMirage.trait)({
+      admin: false,
+      isAdmin: false
+    })
+  });
+});
+define('bs-client/mirage/models/booking', ['exports', 'ember-cli-mirage'], function (exports, _emberCliMirage) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = _emberCliMirage.Model.extend({
+    user: (0, _emberCliMirage.belongsTo)(),
+    rental: (0, _emberCliMirage.belongsTo)()
+  });
+});
+define('bs-client/mirage/models/me', ['exports', 'ember-cli-mirage'], function (exports, _emberCliMirage) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = _emberCliMirage.Model.extend();
+});
+define('bs-client/mirage/models/permission', ['exports', 'ember-cli-mirage'], function (exports, _emberCliMirage) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = _emberCliMirage.Model.extend();
+});
+define('bs-client/mirage/models/rental', ['exports', 'ember-cli-mirage'], function (exports, _emberCliMirage) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = _emberCliMirage.Model.extend({
+    user: (0, _emberCliMirage.belongsTo)()
+  });
+});
+define('bs-client/mirage/models/user-session', ['exports', 'ember-cli-mirage'], function (exports, _emberCliMirage) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = _emberCliMirage.Model;
+});
+define('bs-client/mirage/models/user-sessions-json', ['exports', 'ember-cli-mirage'], function (exports, _emberCliMirage) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = _emberCliMirage.Model.extend();
+});
+define('bs-client/mirage/models/user', ['exports', 'ember-cli-mirage'], function (exports, _emberCliMirage) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = _emberCliMirage.Model.extend({
+    rentals: (0, _emberCliMirage.hasMany)('rental')
+  });
+});
+define("bs-client/mirage/scenarios/default", ["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  exports.default = function () {};
+});
+define('bs-client/mirage/serializers/application', ['exports', 'ember-cli-mirage'], function (exports, _emberCliMirage) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = _emberCliMirage.ActiveModelSerializer;
 });
 define('bs-client/mixins/base-date-picker', ['exports', 'ember-cli-bootstrap-datepicker/components/datepicker-support', 'moment'], function (exports, _datepickerSupport, _moment) {
   'use strict';
@@ -4288,8 +4622,8 @@ define('bs-client/mixins/current-user', ['exports'], function (exports) {
       var redirect = transition || true;
 
       this.get('session').authenticate('authenticator:devise', identification, password).then(function () {
-        var data = _this.get('session.session.content'),
-            token = data.authenticated.session.access_token;
+        var data = _this.get('session.session.content');
+        var token = data.authenticated.session.access_token;
 
         return _this.get('currentUser').load(token).then(function () {
           var redirectUri = _this.get('permissions').accessibleLink();
@@ -4530,10 +4864,10 @@ define('bs-client/models/booking', ['exports', 'ember-data', 'ember-validations'
   });
   exports.default = _emberData.default.Model.extend(_emberValidations.default, {
     validations: {
-      start_at: {
+      startAt: {
         presence: true
       },
-      end_at: {
+      endAt: {
         presence: true
       },
       user: {
@@ -4544,26 +4878,26 @@ define('bs-client/models/booking', ['exports', 'ember-data', 'ember-validations'
       }
     },
 
-    start_at: _emberData.default.attr('date'),
-    end_at: _emberData.default.attr('date'),
+    startAt: _emberData.default.attr('date'),
+    endAt: _emberData.default.attr('date'),
     days: _emberData.default.attr('number', { readOnly: true }),
     price: _emberData.default.attr('number', { readOnly: true }),
 
     user: _emberData.default.belongsTo('user', { async: true }),
     rental: _emberData.default.belongsTo('rental', { async: false }),
 
-    hasStarted: Ember.computed('start_at', function () {
-      return moment(this.get('start_at')) <= moment(new Date());
+    hasStarted: Ember.computed('startAt', function () {
+      return moment(this.get('startAt')) <= moment(new Date());
     }),
 
-    hasEnded: Ember.computed('end_at', function () {
-      return moment(this.get('end_at')) <= moment(new Date());
+    hasEnded: Ember.computed('endAt', function () {
+      return moment(this.get('endAt')) <= moment(new Date());
     }),
 
-    isNow: Ember.computed('start_at', 'end_at', function () {
+    isNow: Ember.computed('startAt', 'endAt', function () {
       var today = new Date();
 
-      return moment(this.get('end_at')) > moment(today) && moment(this.get('start_at')) <= moment(today);
+      return moment(this.get('endAt')) > moment(today) && moment(this.get('startAt')) <= moment(today);
     })
   });
 });
@@ -4634,8 +4968,8 @@ define('bs-client/models/user', ['exports', 'ember-data', 'ember-validations'], 
     password: _emberData.default.attr('string'),
     passwordConfirmation: _emberData.default.attr('string'),
     admin: _emberData.default.attr('boolean', { readOnly: true }),
-
-    role: _emberData.default.belongsTo('role', { async: false }),
+    role: _emberData.default.hasMany('roles', { async: false }),
+    rental: _emberData.default.hasMany('rentals', { async: true }),
 
     isAdmin: Ember.computed.oneWay('admin')
   });
@@ -4757,6 +5091,8 @@ define('bs-client/pods/bookings/new/controller', ['exports', 'ember-data', 'bs-c
     value: true
   });
   exports.default = Ember.Controller.extend(_errorGenerator.default, {
+    pepe: 'ola',
+
     allUsersExceptMe: Ember.computed(function () {
       return this.get('store').query('user', {
         exclude_ids: this.get('currentUser.user.id')
@@ -4769,20 +5105,20 @@ define('bs-client/pods/bookings/new/controller', ['exports', 'ember-data', 'bs-c
       });
     }),
 
-    canShowTo: Ember.computed.oneWay('booking.start_at'),
+    canShowTo: Ember.computed.oneWay('booking.startAt'),
 
-    canShowPrice: Ember.computed.and('booking.start_at', 'booking.end_at'),
+    canShowPrice: Ember.computed.and('booking.startAt', 'booking.endAt'),
 
     canConfirmBooking: Ember.computed.oneWay('canShowPrice'),
 
-    calculatedBookingDays: Ember.computed('booking.start_at', 'booking.end_at', function () {
-      var startDate = moment(this.get('booking.start_at')).startOf('day');
-      var endDate = moment(this.get('booking.end_at')).startOf('day');
+    calculatedBookingDays: Ember.computed('booking.startAt', 'booking.endAt', function () {
+      var startDate = moment(this.get('booking.startAt')).startOf('day');
+      var endDate = moment(this.get('booking.endAt')).startOf('day');
 
       return endDate.diff(startDate, 'days');
     }),
 
-    calculatedBookingPrice: Ember.computed('booking.start_at', 'booking.end_at', 'rental.dailyRate', function () {
+    calculatedBookingPrice: Ember.computed('booking.startAt', 'booking.endAt', 'rental.dailyRate', function () {
       return this.get('rental.dailyRate') * this.get('calculatedBookingDays');
     }),
 
@@ -4859,7 +5195,7 @@ define("bs-client/pods/bookings/new/template", ["exports"], function (exports) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "7ZRmOfUt", "block": "{\"statements\":[[6,[\"modal-dialog\"],null,[[\"onClose\",\"translucentOverlay\",\"targetAttachment\"],[[33,[\"action\"],[[28,[null]],\"close\"],null],true,\"center\"]],{\"statements\":[[0,\"\\n  \"],[11,\"div\",[]],[15,\"class\",\"container\"],[13],[0,\"\\n    \"],[11,\"div\",[]],[15,\"class\",\"row\"],[13],[0,\"\\n      \"],[11,\"div\",[]],[15,\"class\",\"col-md-8 col-md-offset-2\"],[13],[0,\"\\n        \"],[11,\"form\",[]],[15,\"class\",\"form-horizontal\"],[15,\"role\",\"form\"],[13],[0,\"\\n          \"],[11,\"fieldset\",[]],[13],[0,\"\\n            \"],[11,\"legend\",[]],[13],[1,[33,[\"t\"],[\"booking.title\"],null],false],[14],[0,\"\\n\\n            \"],[11,\"div\",[]],[15,\"class\",\"form-group\"],[13],[0,\"\\n              \"],[11,\"label\",[]],[15,\"class\",\"col-sm-2 control-label\"],[13],[0,\"Rental\"],[14],[0,\"\\n              \"],[11,\"div\",[]],[15,\"class\",\"col-sm-10\"],[13],[0,\"\\n                \"],[11,\"input\",[]],[15,\"type\",\"text\"],[15,\"disabled\",\"true\"],[16,\"value\",[28,[\"rental\",\"name\"]],null],[13],[14],[0,\"\\n              \"],[14],[0,\"\\n            \"],[14],[0,\"\\n\\n            \"],[11,\"div\",[]],[15,\"class\",\"form-group\"],[13],[0,\"\\n              \"],[11,\"label\",[]],[15,\"class\",\"col-sm-2 control-label\"],[13],[0,\"From date\"],[14],[0,\"\\n              \"],[11,\"div\",[]],[15,\"class\",\"col-sm-10\"],[13],[0,\"\\n                \"],[1,[33,[\"date-picker\"],null,[[\"value\",\"datesDisabled\",\"clearBtn\"],[[28,[\"booking\",\"start_at\"]],[28,[\"busyDays\"]],true]]],false],[0,\"\\n              \"],[14],[0,\"\\n            \"],[14],[0,\"\\n\\n            \"],[11,\"div\",[]],[15,\"class\",\"form-group\"],[13],[0,\"\\n              \"],[11,\"label\",[]],[15,\"class\",\"col-sm-2 control-label\"],[13],[0,\"To Date\"],[14],[0,\"\\n              \"],[11,\"div\",[]],[15,\"class\",\"col-sm-10\"],[13],[0,\"\\n                \"],[1,[33,[\"date-picker\"],null,[[\"value\",\"datesDisabled\",\"afterDate\",\"clearBtn\"],[[28,[\"booking\",\"end_at\"]],[28,[\"busyDays\"]],[28,[\"booking\",\"start_at\"]],true]]],false],[0,\"\\n              \"],[14],[0,\"\\n            \"],[14],[0,\"\\n\\n\"],[6,[\"if\"],[[28,[\"canShowPrice\"]]],null,{\"statements\":[[0,\"              \"],[11,\"div\",[]],[15,\"class\",\"form-group\"],[13],[0,\"\\n                \"],[11,\"label\",[]],[15,\"class\",\"col-sm-2 control-label\"],[13],[0,\"Days\"],[14],[0,\"\\n                \"],[11,\"div\",[]],[15,\"class\",\"col-sm-10\"],[13],[0,\"\\n                  \"],[11,\"input\",[]],[15,\"type\",\"text\"],[15,\"disabled\",\"true\"],[16,\"value\",[26,[\"calculatedBookingDays\"]],null],[13],[14],[0,\"\\n                \"],[14],[0,\"\\n              \"],[14],[0,\"\\n\\n              \"],[11,\"div\",[]],[15,\"class\",\"form-group\"],[13],[0,\"\\n                \"],[11,\"label\",[]],[15,\"class\",\"col-sm-2 control-label\"],[13],[0,\"Price\"],[14],[0,\"\\n                \"],[11,\"div\",[]],[15,\"class\",\"col-sm-10\"],[13],[0,\"\\n                  \"],[11,\"input\",[]],[15,\"type\",\"text\"],[15,\"disabled\",\"true\"],[16,\"value\",[26,[\"calculatedBookingPrice\"]],null],[13],[14],[0,\"\\n                \"],[14],[0,\"\\n              \"],[14],[0,\"\\n\"]],\"locals\":[]},null],[0,\"\\n            \"],[11,\"div\",[]],[15,\"class\",\"col-sm-offset-2 col-sm-10\"],[13],[0,\"\\n              \"],[11,\"div\",[]],[15,\"class\",\"pull-right\"],[13],[0,\"\\n                \"],[11,\"button\",[]],[15,\"type\",\"button\"],[15,\"class\",\"btn btn-danger\"],[5,[\"action\"],[[28,[null]],\"close\"]],[13],[1,[33,[\"t\"],[\"general.cancel\"],null],false],[14],[0,\"\\n                \"],[11,\"button\",[]],[15,\"type\",\"button\"],[15,\"class\",\"btn btn-success\"],[16,\"disabled\",[33,[\"not\"],[[28,[\"canConfirmBooking\"]]],null],null],[5,[\"action\"],[[28,[null]],\"save\"]],[13],[1,[33,[\"t\"],[\"general.confirm\"],null],false],[14],[0,\"\\n              \"],[14],[0,\"\\n            \"],[14],[0,\"\\n          \"],[14],[0,\"\\n        \"],[14],[0,\"\\n      \"],[14],[0,\"\\n    \"],[14],[0,\"\\n  \"],[14],[0,\"\\n\"]],\"locals\":[]},null]],\"locals\":[],\"named\":[],\"yields\":[],\"hasPartials\":false}", "meta": { "moduleName": "bs-client/pods/bookings/new/template.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "3rmuGM/f", "block": "{\"statements\":[[6,[\"modal-dialog\"],null,[[\"onClose\",\"translucentOverlay\",\"targetAttachment\",\"wrapperClassNames\",\"overlayClassNames\",\"containerClassNames\"],[[33,[\"action\"],[[28,[null]],\"close\"],null],true,\"center\",\"\",\"\",\"\"]],{\"statements\":[[0,\"\\n  \"],[11,\"div\",[]],[15,\"class\",\"container\"],[15,\"data-test-booking-new-dialog\",\"\"],[13],[0,\"\\n    \"],[11,\"div\",[]],[15,\"class\",\"row\"],[13],[0,\"\\n      \"],[11,\"div\",[]],[15,\"class\",\"col-md-8 col-md-offset-2\"],[13],[0,\"\\n        \"],[11,\"form\",[]],[15,\"class\",\"form-horizontal\"],[15,\"role\",\"form\"],[13],[0,\"\\n          \"],[11,\"fieldset\",[]],[13],[0,\"\\n            \"],[11,\"legend\",[]],[13],[1,[33,[\"t\"],[\"booking.title\"],null],false],[14],[0,\"\\n\\n            \"],[11,\"div\",[]],[15,\"class\",\"form-group\"],[13],[0,\"\\n              \"],[11,\"label\",[]],[15,\"class\",\"col-sm-2 control-label\"],[13],[0,\"Rental\"],[14],[0,\"\\n              \"],[11,\"div\",[]],[15,\"class\",\"col-sm-10\"],[13],[0,\"\\n                \"],[11,\"input\",[]],[15,\"data-test-booking-form-rental-name-input\",\"\"],[15,\"type\",\"text\"],[15,\"disabled\",\"true\"],[16,\"value\",[28,[\"rental\",\"name\"]],null],[13],[14],[0,\"\\n              \"],[14],[0,\"\\n            \"],[14],[0,\"\\n\\n            \"],[11,\"div\",[]],[15,\"class\",\"form-group\"],[15,\"data-test-booking-dialog-from-date-div\",\"\"],[13],[0,\"\\n              \"],[11,\"label\",[]],[15,\"class\",\"col-sm-2 control-label\"],[13],[0,\"From date\"],[14],[0,\"\\n              \"],[11,\"div\",[]],[15,\"class\",\"col-sm-10\"],[13],[0,\"\\n                \"],[1,[33,[\"date-picker\"],null,[[\"value\",\"datesDisabled\",\"clearBtn\"],[[28,[\"booking\",\"startAt\"]],[28,[\"busyDays\"]],true]]],false],[0,\"\\n              \"],[14],[0,\"\\n            \"],[14],[0,\"\\n\\n            \"],[11,\"div\",[]],[15,\"class\",\"form-group\"],[15,\"data-test-booking-dialog-to-date-div\",\"\"],[13],[0,\"\\n              \"],[11,\"label\",[]],[15,\"class\",\"col-sm-2 control-label\"],[13],[0,\"To Date\"],[14],[0,\"\\n              \"],[11,\"div\",[]],[15,\"class\",\"col-sm-10\"],[13],[0,\"\\n                \"],[1,[33,[\"date-picker\"],null,[[\"value\",\"datesDisabled\",\"afterDate\",\"clearBtn\"],[[28,[\"booking\",\"endAt\"]],[28,[\"busyDays\"]],[28,[\"booking\",\"startAt\"]],true]]],false],[0,\"\\n              \"],[14],[0,\"\\n            \"],[14],[0,\"\\n\\n\"],[6,[\"if\"],[[28,[\"canShowPrice\"]]],null,{\"statements\":[[0,\"              \"],[11,\"div\",[]],[15,\"class\",\"form-group\"],[13],[0,\"\\n                \"],[11,\"label\",[]],[15,\"class\",\"col-sm-2 control-label\"],[13],[0,\"Days\"],[14],[0,\"\\n                \"],[11,\"div\",[]],[15,\"class\",\"col-sm-10\"],[13],[0,\"\\n                  \"],[11,\"input\",[]],[15,\"type\",\"text\"],[15,\"data-test-booking-form-days-input\",\"\"],[15,\"disabled\",\"true\"],[16,\"value\",[26,[\"calculatedBookingDays\"]],null],[13],[14],[0,\"\\n                \"],[14],[0,\"\\n              \"],[14],[0,\"\\n\\n              \"],[11,\"div\",[]],[15,\"class\",\"form-group\"],[13],[0,\"\\n                \"],[11,\"label\",[]],[15,\"class\",\"col-sm-2 control-label\"],[13],[0,\"Price\"],[14],[0,\"\\n                \"],[11,\"div\",[]],[15,\"class\",\"col-sm-10\"],[13],[0,\"\\n                  \"],[11,\"input\",[]],[15,\"type\",\"text\"],[15,\"disabled\",\"true\"],[16,\"value\",[26,[\"calculatedBookingPrice\"]],null],[13],[14],[0,\"\\n                \"],[14],[0,\"\\n              \"],[14],[0,\"\\n\"]],\"locals\":[]},{\"statements\":[[0,\"              \"],[11,\"span\",[]],[15,\"class\",\"test\"],[13],[0,\"[\"],[1,[28,[\"booking\",\"startAt\"]],false],[0,\"][\"],[1,[28,[\"booking\",\"endAt\"]],false],[0,\"]\"],[14],[0,\"\\n\"]],\"locals\":[]}],[0,\"\\n            \"],[11,\"div\",[]],[15,\"class\",\"col-sm-offset-2 col-sm-10\"],[13],[0,\"\\n              \"],[11,\"div\",[]],[15,\"class\",\"pull-right\"],[13],[0,\"\\n                \"],[11,\"button\",[]],[15,\"type\",\"button\"],[15,\"class\",\"btn btn-danger\"],[5,[\"action\"],[[28,[null]],\"close\"]],[13],[1,[33,[\"t\"],[\"general.cancel\"],null],false],[14],[0,\"\\n                \"],[11,\"button\",[]],[15,\"type\",\"button\"],[15,\"data-test-booking-form-confirm-btn\",\"\"],[15,\"class\",\"btn btn-success\"],[16,\"disabled\",[33,[\"not\"],[[28,[\"canConfirmBooking\"]]],null],null],[5,[\"action\"],[[28,[null]],\"save\"]],[13],[1,[33,[\"t\"],[\"general.confirm\"],null],false],[14],[0,\"\\n              \"],[14],[0,\"\\n            \"],[14],[0,\"\\n          \"],[14],[0,\"\\n        \"],[14],[0,\"\\n      \"],[14],[0,\"\\n    \"],[14],[0,\"\\n  \"],[14],[0,\"\\n\"]],\"locals\":[]},null]],\"locals\":[],\"named\":[],\"yields\":[],\"hasPartials\":false}", "meta": { "moduleName": "bs-client/pods/bookings/new/template.hbs" } });
 });
 define('bs-client/pods/bookings/route', ['exports', 'bs-client/mixins/current-user'], function (exports, _currentUser) {
   'use strict';
@@ -4937,7 +5273,7 @@ define("bs-client/pods/bookings/template", ["exports"], function (exports) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "tt03z5Fh", "block": "{\"statements\":[[11,\"div\",[]],[15,\"class\",\"row filters\"],[13],[0,\"\\n  \"],[11,\"div\",[]],[15,\"class\",\"col-md-2\"],[13],[0,\"\\n    \"],[1,[33,[\"input\"],null,[[\"value\",\"placeholder\"],[[28,[\"rentalFilter\"]],\"Rental\"]]],false],[0,\"\\n  \"],[14],[0,\"\\n\\n\"],[6,[\"if\"],[[33,[\"can\"],[\"see user booking\"],null]],null,{\"statements\":[[0,\"    \"],[11,\"div\",[]],[15,\"class\",\"col-md-3\"],[13],[0,\"\\n\"],[6,[\"power-select\"],null,[[\"options\",\"selected\",\"allowClear\",\"placeholder\",\"onchange\"],[[28,[\"allUsersExceptMe\"]],[28,[\"userFilterObj\"]],true,[33,[\"t\"],[\"booking.filter.user\"],null],[33,[\"action\"],[[28,[null]],\"selectUserFilter\"],null]]],{\"statements\":[[0,\"      \"],[1,[28,[\"user\",\"email\"]],false],[0,\"\\n\"]],\"locals\":[\"user\"]},null],[0,\"    \"],[14],[0,\"\\n\"]],\"locals\":[]},null],[0,\"\\n  \"],[11,\"div\",[]],[15,\"class\",\"col-md-2\"],[13],[0,\"\\n\"],[6,[\"power-select\"],null,[[\"options\",\"selected\",\"placeholder\",\"onchange\"],[[28,[\"availableDateFilters\"]],[28,[\"dateFilter\"]],[33,[\"t\"],[\"booking.filter.date_filter.title\"],null],[33,[\"action\"],[[28,[null]],[33,[\"mut\"],[[28,[\"dateFilter\"]]],null]],null]]],{\"statements\":[[0,\"      \"],[1,[33,[\"t\"],[[33,[\"concat\"],[\"booking.filter.date_filter.\",[28,[\"filter\"]]],null]],null],false],[0,\"\\n\"]],\"locals\":[\"filter\"]},null],[0,\"  \"],[14],[0,\"\\n\\n  \"],[11,\"div\",[]],[15,\"class\",\"col-md-2\"],[13],[0,\"\\n    \"],[1,[33,[\"date-picker\"],null,[[\"value\",\"placeholder\",\"action\",\"clearBtn\"],[[28,[\"from\"]],\"From\",\"setFromDate\",true]]],false],[0,\"\\n  \"],[14],[0,\"\\n\\n  \"],[11,\"div\",[]],[15,\"class\",\"col-md-2\"],[13],[0,\"\\n    \"],[1,[33,[\"date-picker\"],null,[[\"value\",\"placeholder\",\"action\",\"clearBtn\"],[[28,[\"to\"]],\"To\",\"setToDate\",true]]],false],[0,\"\\n  \"],[14],[0,\"\\n\"],[14],[0,\"\\n\\n\"],[6,[\"x-table\"],null,[[\"columns\",\"sortableFields\",\"modelName\",\"showActionsColumn\",\"sortField\",\"sortDirection\"],[[28,[\"availableColumns\"]],[28,[\"availableColumns\"]],\"booking\",true,[28,[\"sortField\"]],[28,[\"sortDirection\"]]]],{\"statements\":[[6,[\"each\"],[[28,[\"bookings\"]]],null,{\"statements\":[[0,\"    \"],[11,\"tr\",[]],[16,\"class\",[34,[[33,[\"if\"],[[28,[\"booking\",\"hasEnded\"]],\"ended-booking\",\"\"],null],\" \",[33,[\"if\"],[[28,[\"booking\",\"isNow\"]],\"active-booking\",\"\"],null]]]],[13],[0,\"\\n      \"],[11,\"td\",[]],[13],[0,\"\\n        \"],[1,[28,[\"booking\",\"rental\",\"name\"]],false],[0,\"\\n      \"],[14],[0,\"\\n\\n\"],[6,[\"if\"],[[33,[\"can\"],[\"see user booking\"],null]],null,{\"statements\":[[0,\"        \"],[11,\"td\",[]],[13],[0,\"\\n          \"],[1,[28,[\"booking\",\"user\",\"email\"]],false],[0,\"\\n        \"],[14],[0,\"\\n\"]],\"locals\":[]},null],[0,\"\\n      \"],[11,\"td\",[]],[13],[0,\"\\n        \"],[1,[33,[\"format-date\"],[[28,[\"booking\",\"start_at\"]]],[[\"locale\"],[\"fr\"]]],false],[0,\"\\n      \"],[14],[0,\"\\n\\n      \"],[11,\"td\",[]],[13],[0,\"\\n        \"],[1,[33,[\"format-date\"],[[28,[\"booking\",\"end_at\"]]],[[\"locale\"],[\"fr\"]]],false],[0,\"\\n      \"],[14],[0,\"\\n\\n      \"],[11,\"td\",[]],[13],[0,\"\\n        \"],[1,[28,[\"booking\",\"days\"]],false],[0,\"\\n      \"],[14],[0,\"\\n\\n      \"],[11,\"td\",[]],[13],[0,\"\\n        \"],[1,[33,[\"format-money\"],[[28,[\"booking\",\"price\"]]],null],false],[0,\"\\n      \"],[14],[0,\"\\n\\n      \"],[11,\"td\",[]],[13],[0,\"\\n\"],[6,[\"if\"],[[33,[\"can\"],[\"edit booking\",[28,[\"booking\"]]],null]],null,{\"statements\":[[0,\"          \"],[6,[\"link-to\"],[\"bookings.edit\",[28,[\"booking\"]]],null,{\"statements\":[[1,[33,[\"fa-icon\"],[\"pencil\"],null],false]],\"locals\":[]},null],[0,\"\\n\"]],\"locals\":[]},null],[0,\"\\n\"],[6,[\"if\"],[[33,[\"can\"],[\"delete booking\",[28,[\"booking\"]]],null]],null,{\"statements\":[[0,\"          \"],[11,\"a\",[]],[15,\"href\",\"#\"],[16,\"title\",[33,[\"t\"],[\"booking.tips.delete\"],null],null],[5,[\"action\"],[[28,[null]],\"delete\",[28,[\"booking\"]]]],[13],[1,[33,[\"fa-icon\"],[\"remove\"],null],false],[14],[0,\"\\n\"]],\"locals\":[]},null],[0,\"      \"],[14],[0,\"\\n    \"],[14],[0,\"\\n\"]],\"locals\":[\"booking\"]},null]],\"locals\":[]},null],[1,[33,[\"x-paginator\"],null,[[\"content\",\"changePage\",\"page\"],[[28,[\"rentals\"]],[33,[\"action\"],[[28,[null]],[33,[\"mut\"],[[28,[\"page\"]]],null]],null],[28,[\"page\"]]]]],false],[0,\"\\n\\n\"],[1,[26,[\"outlet\"]],false],[0,\"\\n\"]],\"locals\":[],\"named\":[],\"yields\":[],\"hasPartials\":false}", "meta": { "moduleName": "bs-client/pods/bookings/template.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "IYh82RVb", "block": "{\"statements\":[[11,\"div\",[]],[15,\"class\",\"row filters\"],[13],[0,\"\\n  \"],[11,\"div\",[]],[15,\"class\",\"col-md-2\"],[13],[0,\"\\n    \"],[1,[33,[\"input\"],null,[[\"value\",\"placeholder\"],[[28,[\"rentalFilter\"]],\"Rental\"]]],false],[0,\"\\n  \"],[14],[0,\"\\n\\n\"],[6,[\"if\"],[[33,[\"can\"],[\"see user booking\"],null]],null,{\"statements\":[[0,\"    \"],[11,\"div\",[]],[15,\"class\",\"col-md-3\"],[13],[0,\"\\n\"],[6,[\"power-select\"],null,[[\"options\",\"selected\",\"allowClear\",\"placeholder\",\"onchange\"],[[28,[\"allUsersExceptMe\"]],[28,[\"userFilterObj\"]],true,[33,[\"t\"],[\"booking.filter.user\"],null],[33,[\"action\"],[[28,[null]],\"selectUserFilter\"],null]]],{\"statements\":[[0,\"      \"],[1,[28,[\"user\",\"email\"]],false],[0,\"\\n\"]],\"locals\":[\"user\"]},null],[0,\"    \"],[14],[0,\"\\n\"]],\"locals\":[]},null],[0,\"\\n  \"],[11,\"div\",[]],[15,\"class\",\"col-md-2\"],[13],[0,\"\\n\"],[6,[\"power-select\"],null,[[\"options\",\"selected\",\"placeholder\",\"onchange\"],[[28,[\"availableDateFilters\"]],[28,[\"dateFilter\"]],[33,[\"t\"],[\"booking.filter.date_filter.title\"],null],[33,[\"action\"],[[28,[null]],[33,[\"mut\"],[[28,[\"dateFilter\"]]],null]],null]]],{\"statements\":[[0,\"      \"],[1,[33,[\"t\"],[[33,[\"concat\"],[\"booking.filter.date_filter.\",[28,[\"filter\"]]],null]],null],false],[0,\"\\n\"]],\"locals\":[\"filter\"]},null],[0,\"  \"],[14],[0,\"\\n\\n  \"],[11,\"div\",[]],[15,\"class\",\"col-md-2\"],[13],[0,\"\\n    \"],[1,[33,[\"date-picker\"],null,[[\"value\",\"placeholder\",\"action\",\"clearBtn\"],[[28,[\"from\"]],\"From\",\"setFromDate\",true]]],false],[0,\"\\n  \"],[14],[0,\"\\n\\n  \"],[11,\"div\",[]],[15,\"class\",\"col-md-2\"],[13],[0,\"\\n    \"],[1,[33,[\"date-picker\"],null,[[\"value\",\"placeholder\",\"action\",\"clearBtn\"],[[28,[\"to\"]],\"To\",\"setToDate\",true]]],false],[0,\"\\n  \"],[14],[0,\"\\n\"],[14],[0,\"\\n\\n\"],[6,[\"x-table\"],null,[[\"columns\",\"sortableFields\",\"modelName\",\"showActionsColumn\",\"sortField\",\"sortDirection\"],[[28,[\"availableColumns\"]],[28,[\"availableColumns\"]],\"booking\",true,[28,[\"sortField\"]],[28,[\"sortDirection\"]]]],{\"statements\":[[6,[\"each\"],[[28,[\"bookings\"]]],null,{\"statements\":[[0,\"    \"],[11,\"tr\",[]],[15,\"data-test-booking-tr\",\"\"],[16,\"class\",[34,[[33,[\"if\"],[[28,[\"booking\",\"hasEnded\"]],\"ended-booking\",\"\"],null],\" \",[33,[\"if\"],[[28,[\"booking\",\"isNow\"]],\"active-booking\",\"\"],null]]]],[13],[0,\"\\n      \"],[11,\"td\",[]],[13],[0,\"\\n        \"],[1,[28,[\"booking\",\"rental\",\"name\"]],false],[0,\"\\n      \"],[14],[0,\"\\n\\n\"],[6,[\"if\"],[[33,[\"can\"],[\"see user booking\"],null]],null,{\"statements\":[[0,\"        \"],[11,\"td\",[]],[13],[0,\"\\n          \"],[1,[28,[\"booking\",\"user\",\"email\"]],false],[0,\"\\n        \"],[14],[0,\"\\n\"]],\"locals\":[]},null],[0,\"\\n      \"],[11,\"td\",[]],[15,\"data-test-booking-start-at-td\",\"\"],[13],[0,\"\\n        \"],[1,[33,[\"format-date\"],[[28,[\"booking\",\"startAt\"]]],[[\"locale\"],[\"fr\"]]],false],[0,\"\\n      \"],[14],[0,\"\\n\\n      \"],[11,\"td\",[]],[15,\"data-test-booking-end-at-td\",\"\"],[13],[0,\"\\n        \"],[1,[33,[\"format-date\"],[[28,[\"booking\",\"endAt\"]]],[[\"locale\"],[\"fr\"]]],false],[0,\"\\n      \"],[14],[0,\"\\n\\n      \"],[11,\"td\",[]],[13],[0,\"\\n        \"],[1,[28,[\"booking\",\"days\"]],false],[0,\"\\n      \"],[14],[0,\"\\n\\n      \"],[11,\"td\",[]],[15,\"data-test-booking-price-td\",\"\"],[13],[0,\"\\n        \"],[1,[33,[\"format-money\"],[[28,[\"booking\",\"price\"]]],null],false],[0,\"\\n      \"],[14],[0,\"\\n\\n      \"],[11,\"td\",[]],[13],[0,\"\\n\"],[6,[\"if\"],[[33,[\"can\"],[\"edit booking\",[28,[\"booking\"]]],null]],null,{\"statements\":[[0,\"          \"],[6,[\"link-to\"],[\"bookings.edit\",[28,[\"booking\"]]],[[\"data-test-booking-edit-btn\"],[true]],{\"statements\":[[1,[33,[\"fa-icon\"],[\"pencil\"],null],false]],\"locals\":[]},null],[0,\"\\n\"]],\"locals\":[]},null],[0,\"\\n\"],[6,[\"if\"],[[33,[\"can\"],[\"delete booking\",[28,[\"booking\"]]],null]],null,{\"statements\":[[0,\"          \"],[11,\"a\",[]],[15,\"href\",\"#\"],[15,\"data-test-booking-delete-btn\",\"\"],[16,\"title\",[33,[\"t\"],[\"booking.tips.delete\"],null],null],[5,[\"action\"],[[28,[null]],\"delete\",[28,[\"booking\"]]]],[13],[1,[33,[\"fa-icon\"],[\"remove\"],null],false],[14],[0,\"\\n\"]],\"locals\":[]},null],[0,\"      \"],[14],[0,\"\\n    \"],[14],[0,\"\\n\"]],\"locals\":[\"booking\"]},null]],\"locals\":[]},null],[1,[33,[\"x-paginator\"],null,[[\"content\",\"changePage\",\"page\"],[[28,[\"rentals\"]],[33,[\"action\"],[[28,[null]],[33,[\"mut\"],[[28,[\"page\"]]],null]],null],[28,[\"page\"]]]]],false],[0,\"\\n\\n\"],[1,[26,[\"outlet\"]],false],[0,\"\\n\"]],\"locals\":[],\"named\":[],\"yields\":[],\"hasPartials\":false}", "meta": { "moduleName": "bs-client/pods/bookings/template.hbs" } });
 });
 define('bs-client/pods/landing/controller', ['exports'], function (exports) {
   'use strict';
@@ -5127,7 +5463,7 @@ define("bs-client/pods/rentals/new/template", ["exports"], function (exports) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "2rn+sWMk", "block": "{\"statements\":[[6,[\"modal-dialog\"],null,[[\"onClose\",\"translucentOverlay\",\"targetAttachment\"],[[33,[\"action\"],[[28,[null]],\"close\"],null],true,\"center\"]],{\"statements\":[[0,\"\\n  \"],[11,\"div\",[]],[15,\"class\",\"container\"],[13],[0,\"\\n    \"],[11,\"div\",[]],[15,\"class\",\"row\"],[13],[0,\"\\n      \"],[11,\"div\",[]],[15,\"class\",\"col-md-8 col-md-offset-2\"],[13],[0,\"\\n        \"],[11,\"form\",[]],[15,\"class\",\"form-horizontal\"],[15,\"role\",\"form\"],[13],[0,\"\\n          \"],[11,\"fieldset\",[]],[13],[0,\"\\n            \"],[11,\"legend\",[]],[13],[1,[33,[\"t\"],[\"rental.actions.new_rental\"],null],false],[14],[0,\"\\n\\n\"],[6,[\"if\"],[[33,[\"can\"],[\"change user rental\"],null]],null,{\"statements\":[[0,\"              \"],[11,\"div\",[]],[15,\"class\",\"form-group\"],[13],[0,\"\\n                \"],[11,\"label\",[]],[15,\"class\",\"col-sm-2 control-label\"],[13],[1,[33,[\"t\"],[\"rental.columns.user\"],null],false],[14],[0,\"\\n                \"],[11,\"div\",[]],[15,\"class\",\"col-sm-10\"],[13],[0,\"\\n\"],[6,[\"power-select\"],null,[[\"options\",\"loadingMessage\",\"selected\",\"onchange\"],[[28,[\"allUsersExceptMe\"]],\"Loading\",[28,[\"rental\",\"user\"]],[33,[\"action\"],[[28,[null]],[33,[\"mut\"],[[28,[\"rental\",\"user\"]]],null]],null]]],{\"statements\":[[0,\"                    \"],[1,[28,[\"user\",\"email\"]],false],[0,\"\\n\"]],\"locals\":[\"user\"]},null],[0,\"                \"],[14],[0,\"\\n              \"],[14],[0,\"\\n\"]],\"locals\":[]},null],[0,\"\\n            \"],[11,\"div\",[]],[15,\"class\",\"form-group\"],[13],[0,\"\\n              \"],[11,\"label\",[]],[15,\"class\",\"col-sm-2 control-label\"],[13],[1,[33,[\"t\"],[\"rental.columns.name\"],null],false],[14],[0,\"\\n              \"],[11,\"div\",[]],[15,\"class\",\"col-sm-10\"],[13],[0,\"\\n                \"],[1,[33,[\"input\"],null,[[\"value\"],[[28,[\"rental\",\"name\"]]]]],false],[0,\"\\n              \"],[14],[0,\"\\n            \"],[14],[0,\"\\n\\n            \"],[11,\"div\",[]],[15,\"class\",\"form-group\"],[13],[0,\"\\n              \"],[11,\"label\",[]],[15,\"class\",\"col-sm-2 control-label\"],[13],[1,[33,[\"t\"],[\"rental.columns.daily_rate\"],null],false],[14],[0,\"\\n              \"],[11,\"div\",[]],[15,\"class\",\"col-sm-10\"],[13],[0,\"\\n                \"],[1,[33,[\"input\"],null,[[\"type\",\"min\",\"step\",\"value\"],[\"number\",\"0\",\".01\",[28,[\"rental\",\"dailyRate\"]]]]],false],[0,\"\\n              \"],[14],[0,\"\\n            \"],[14],[0,\"\\n\\n            \"],[11,\"div\",[]],[15,\"class\",\"col-sm-offset-2 col-sm-10\"],[13],[0,\"\\n              \"],[11,\"div\",[]],[15,\"class\",\"pull-right\"],[13],[0,\"\\n                \"],[11,\"button\",[]],[15,\"type\",\"button\"],[15,\"class\",\"btn btn-danger\"],[5,[\"action\"],[[28,[null]],\"close\"]],[13],[1,[33,[\"t\"],[\"general.cancel\"],null],false],[14],[0,\"\\n                \"],[11,\"button\",[]],[15,\"type\",\"button\"],[15,\"class\",\"btn btn-success\"],[16,\"disabled\",[33,[\"not\"],[[33,[\"can\"],[\"save rental\"],null]],null],null],[5,[\"action\"],[[28,[null]],\"save\"]],[13],[1,[33,[\"t\"],[\"general.confirm\"],null],false],[14],[0,\"\\n              \"],[14],[0,\"\\n            \"],[14],[0,\"\\n          \"],[14],[0,\"\\n        \"],[14],[0,\"\\n      \"],[14],[0,\"\\n    \"],[14],[0,\"\\n  \"],[14],[0,\"\\n\"]],\"locals\":[]},null]],\"locals\":[],\"named\":[],\"yields\":[],\"hasPartials\":false}", "meta": { "moduleName": "bs-client/pods/rentals/new/template.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "T9GPibKu", "block": "{\"statements\":[[6,[\"modal-dialog\"],null,[[\"onClose\",\"translucentOverlay\",\"targetAttachment\",\"wrapperClassNames\",\"overlayClassNames\",\"containerClassNames\"],[[33,[\"action\"],[[28,[null]],\"close\"],null],true,\"center\",\"\",\"\",\"\"]],{\"statements\":[[0,\"\\n  \"],[11,\"div\",[]],[15,\"class\",\"container\"],[15,\"data-test-rental-new-dialog\",\"\"],[13],[0,\"\\n    \"],[11,\"div\",[]],[15,\"class\",\"row\"],[13],[0,\"\\n      \"],[11,\"div\",[]],[15,\"class\",\"col-md-8 col-md-offset-2\"],[13],[0,\"\\n        \"],[11,\"form\",[]],[15,\"class\",\"form-horizontal\"],[15,\"role\",\"form\"],[13],[0,\"\\n          \"],[11,\"fieldset\",[]],[13],[0,\"\\n            \"],[11,\"legend\",[]],[13],[1,[33,[\"t\"],[\"rental.actions.new_rental\"],null],false],[14],[0,\"\\n\\n\"],[6,[\"if\"],[[33,[\"can\"],[\"change user rental\"],null]],null,{\"statements\":[[0,\"              \"],[11,\"div\",[]],[15,\"class\",\"form-group\"],[13],[0,\"\\n                \"],[11,\"label\",[]],[15,\"class\",\"col-sm-2 control-label\"],[13],[1,[33,[\"t\"],[\"rental.columns.user\"],null],false],[14],[0,\"\\n                \"],[11,\"div\",[]],[15,\"class\",\"col-sm-10\"],[13],[0,\"\\n\"],[6,[\"power-select\"],null,[[\"options\",\"loadingMessage\",\"selected\",\"onchange\"],[[28,[\"allUsersExceptMe\"]],\"Loading\",[28,[\"rental\",\"user\"]],[33,[\"action\"],[[28,[null]],[33,[\"mut\"],[[28,[\"rental\",\"user\"]]],null]],null]]],{\"statements\":[[0,\"                    \"],[1,[28,[\"user\",\"email\"]],false],[0,\"\\n\"]],\"locals\":[\"user\"]},null],[0,\"                \"],[14],[0,\"\\n              \"],[14],[0,\"\\n\"]],\"locals\":[]},null],[0,\"\\n            \"],[11,\"div\",[]],[15,\"class\",\"form-group\"],[13],[0,\"\\n              \"],[11,\"label\",[]],[15,\"class\",\"col-sm-2 control-label\"],[13],[1,[33,[\"t\"],[\"rental.columns.name\"],null],false],[14],[0,\"\\n              \"],[11,\"div\",[]],[15,\"class\",\"col-sm-10\"],[13],[0,\"\\n                \"],[1,[33,[\"input\"],null,[[\"value\",\"data-test-rental-new-dialog-name-input\"],[[28,[\"rental\",\"name\"]],true]]],false],[0,\"\\n              \"],[14],[0,\"\\n            \"],[14],[0,\"\\n\\n            \"],[11,\"div\",[]],[15,\"class\",\"form-group\"],[13],[0,\"\\n              \"],[11,\"label\",[]],[15,\"class\",\"col-sm-2 control-label\"],[13],[1,[33,[\"t\"],[\"rental.columns.daily_rate\"],null],false],[14],[0,\"\\n              \"],[11,\"div\",[]],[15,\"class\",\"col-sm-10\"],[13],[0,\"\\n                \"],[1,[33,[\"input\"],null,[[\"type\",\"min\",\"step\",\"value\"],[\"number\",\"0\",\".01\",[28,[\"rental\",\"dailyRate\"]]]]],false],[0,\"\\n              \"],[14],[0,\"\\n            \"],[14],[0,\"\\n\\n            \"],[11,\"div\",[]],[15,\"class\",\"col-sm-offset-2 col-sm-10\"],[13],[0,\"\\n              \"],[11,\"div\",[]],[15,\"class\",\"pull-right\"],[13],[0,\"\\n                \"],[11,\"button\",[]],[15,\"type\",\"button\"],[15,\"class\",\"btn btn-danger\"],[5,[\"action\"],[[28,[null]],\"close\"]],[13],[1,[33,[\"t\"],[\"general.cancel\"],null],false],[14],[0,\"\\n                \"],[11,\"button\",[]],[15,\"type\",\"button\"],[15,\"class\",\"btn btn-success\"],[16,\"disabled\",[33,[\"not\"],[[33,[\"can\"],[\"save rental\"],null]],null],null],[5,[\"action\"],[[28,[null]],\"save\"]],[13],[1,[33,[\"t\"],[\"general.confirm\"],null],false],[14],[0,\"\\n              \"],[14],[0,\"\\n            \"],[14],[0,\"\\n          \"],[14],[0,\"\\n        \"],[14],[0,\"\\n      \"],[14],[0,\"\\n    \"],[14],[0,\"\\n  \"],[14],[0,\"\\n\"]],\"locals\":[]},null]],\"locals\":[],\"named\":[],\"yields\":[],\"hasPartials\":false}", "meta": { "moduleName": "bs-client/pods/rentals/new/template.hbs" } });
 });
 define('bs-client/pods/rentals/route', ['exports', 'bs-client/config/environment'], function (exports, _environment) {
   'use strict';
@@ -5189,9 +5525,6 @@ define('bs-client/pods/rentals/route', ['exports', 'bs-client/config/environment
     setupController: function setupController(controller, model, params) {
       controller.set('rentals', model.rentals);
       controller.set('rentalFilter', params.queryParams.q);
-      controller.set('userFilterObj', params.queryParams.userFilter);
-      controller.set('from', params.queryParams.priceFromFilter);
-      controller.set('to', params.queryParams.priceToFilter);
 
       var defaultMaxDailyRate = Math.ceil(model.rentalDailyRateRanges.max_daily_rate);
       var defaultPriceRange = [];
@@ -5235,7 +5568,7 @@ define("bs-client/pods/rentals/template", ["exports"], function (exports) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "trVhchg5", "block": "{\"statements\":[[6,[\"if\"],[[33,[\"can\"],[\"create rental\"],null]],null,{\"statements\":[[0,\"  \"],[11,\"div\",[]],[15,\"class\",\"row-fluid\"],[13],[0,\"\\n    \"],[11,\"div\",[]],[15,\"class\",\"pull-right action-buttons-div\"],[13],[0,\"\\n      \"],[6,[\"link-to\"],[\"rentals.new\"],[[\"class\"],[\"btn btn-info\"]],{\"statements\":[[1,[33,[\"t\"],[\"rental.actions.new_rental\"],null],false]],\"locals\":[]},null],[0,\"\\n    \"],[14],[0,\"\\n  \"],[14],[0,\"\\n\"]],\"locals\":[]},null],[0,\"\\n\"],[11,\"div\",[]],[15,\"class\",\"row-fluid filters\"],[13],[0,\"\\n  \"],[11,\"div\",[]],[15,\"class\",\"col-md-2\"],[13],[0,\"\\n    \"],[1,[33,[\"input\"],null,[[\"value\",\"placeholder\"],[[28,[\"rentalFilter\"]],\"Rental\"]]],false],[0,\"\\n  \"],[14],[0,\"\\n\\n\"],[6,[\"if\"],[[33,[\"can\"],[\"see user booking\"],null]],null,{\"statements\":[[0,\"    \"],[11,\"div\",[]],[15,\"class\",\"col-md-3\"],[13],[0,\"\\n\"],[6,[\"power-select\"],null,[[\"options\",\"selected\",\"allowClear\",\"placeholder\",\"onchange\"],[[28,[\"allUsersExceptMe\"]],[28,[\"userFilterObj\"]],true,[33,[\"t\"],[\"rental.filter.user\"],null],[33,[\"action\"],[[28,[null]],\"selectUserFilter\"],null]]],{\"statements\":[[0,\"      \"],[1,[28,[\"user\",\"email\"]],false],[0,\"\\n\"]],\"locals\":[\"user\"]},null],[0,\"    \"],[14],[0,\"\\n\"]],\"locals\":[]},null],[0,\"\\n  \"],[11,\"div\",[]],[15,\"class\",\"col-md-5\"],[13],[0,\"\\n    \"],[11,\"div\",[]],[15,\"class\",\"col-md-3\"],[13],[0,\"\\n      \"],[11,\"span\",[]],[13],[1,[33,[\"t\"],[\"rental.filter.price_range\"],null],false],[14],[0,\"\\n    \"],[14],[0,\"\\n    \"],[11,\"div\",[]],[15,\"class\",\"col-md-8\"],[13],[0,\"\\n      \"],[1,[33,[\"range-slider\"],null,[[\"value\",\"mood\",\"changed\",\"tooltip\",\"tooltipPosition\",\"min\",\"step\",\"max\"],[[28,[\"defaultPriceRange\"]],\"success\",\"priceFilterChange\",\"show\",\"top\",0,1,[28,[\"defaultMaxDailyRate\"]]]]],false],[0,\"\\n      \"],[14],[0,\"\\n  \"],[14],[0,\"\\n\"],[14],[0,\"\\n\\n\"],[6,[\"x-table\"],null,[[\"columns\",\"sortableFields\",\"modelName\",\"sortField\",\"sortDirection\"],[[28,[\"availableColumns\"]],[28,[\"availableColumns\"]],\"rental\",[28,[\"sortField\"]],[28,[\"sortDirection\"]]]],{\"statements\":[[6,[\"if\"],[[28,[\"rentals\",\"isPending\"]]],null,{\"statements\":[[0,\"    \"],[1,[26,[\"x-loading\"]],false],[0,\"\\n\"]],\"locals\":[]},{\"statements\":[[6,[\"each\"],[[28,[\"rentals\"]]],null,{\"statements\":[[0,\"      \"],[11,\"tr\",[]],[13],[0,\"\\n        \"],[11,\"td\",[]],[13],[0,\"\\n          \"],[1,[28,[\"rental\",\"name\"]],false],[0,\"\\n        \"],[14],[0,\"\\n\\n\"],[6,[\"if\"],[[28,[\"canShowToAdmin\"]]],null,{\"statements\":[[0,\"          \"],[11,\"td\",[]],[13],[0,\"\\n            \"],[1,[28,[\"rental\",\"user\",\"email\"]],false],[0,\"\\n          \"],[14],[0,\"\\n\"]],\"locals\":[]},null],[0,\"\\n        \"],[11,\"td\",[]],[13],[0,\"\\n          \"],[1,[33,[\"format-money\"],[[28,[\"rental\",\"dailyRate\"]]],null],false],[0,\"\\n        \"],[14],[0,\"\\n\\n        \"],[11,\"td\",[]],[13],[0,\"\\n\"],[6,[\"if\"],[[33,[\"can\"],[\"book rental\",[28,[\"rental\"]]],null]],null,{\"statements\":[[0,\"            \"],[11,\"a\",[]],[15,\"href\",\"#\"],[16,\"title\",[33,[\"t\"],[\"rental.tips.book\"],null],null],[5,[\"action\"],[[28,[null]],\"book\",[28,[\"rental\"]]]],[13],[1,[33,[\"fa-icon\"],[\"shopping-cart\"],null],false],[14],[0,\"\\n\"]],\"locals\":[]},null],[0,\"\\n\"],[6,[\"if\"],[[33,[\"can\"],[\"edit rental\",[28,[\"rental\"]]],null]],null,{\"statements\":[[0,\"            \"],[6,[\"link-to\"],[\"rentals.edit\",[28,[\"rental\"]]],null,{\"statements\":[[1,[33,[\"fa-icon\"],[\"pencil\"],null],false]],\"locals\":[]},null],[0,\"\\n\"]],\"locals\":[]},null],[0,\"\\n\"],[6,[\"if\"],[[33,[\"can\"],[\"delete rental\",[28,[\"rental\"]]],null]],null,{\"statements\":[[0,\"            \"],[11,\"a\",[]],[15,\"href\",\"#\"],[16,\"title\",[33,[\"t\"],[\"rental.tips.delete\"],null],null],[5,[\"action\"],[[28,[null]],\"delete\",[28,[\"rental\"]]]],[13],[1,[33,[\"fa-icon\"],[\"remove\"],null],false],[14],[0,\"\\n\"]],\"locals\":[]},null],[0,\"        \"],[14],[0,\"\\n      \"],[14],[0,\"\\n\"]],\"locals\":[\"rental\"]},null]],\"locals\":[]}]],\"locals\":[]},null],[0,\"\\n\"],[1,[33,[\"x-paginator\"],null,[[\"content\",\"changePage\",\"page\"],[[28,[\"rentals\"]],[33,[\"action\"],[[28,[null]],[33,[\"mut\"],[[28,[\"page\"]]],null]],null],[28,[\"page\"]]]]],false],[0,\"\\n\\n\"],[6,[\"if\"],[[28,[\"isShowingBookingModal\"]]],null,{\"statements\":[[0,\"  \"],[1,[33,[\"x-booking-rental\"],null,[[\"rental\",\"isShowingBookingModal\"],[[28,[\"selectedRental\"]],[28,[\"isShowingBookingModal\"]]]]],false],[0,\"\\n\"]],\"locals\":[]},null],[0,\"\\n\"],[1,[26,[\"outlet\"]],false],[0,\"\\n\"]],\"locals\":[],\"named\":[],\"yields\":[],\"hasPartials\":false}", "meta": { "moduleName": "bs-client/pods/rentals/template.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "gW6bTWFs", "block": "{\"statements\":[[6,[\"if\"],[[33,[\"can\"],[\"create rental\"],null]],null,{\"statements\":[[0,\"  \"],[11,\"div\",[]],[15,\"class\",\"row-fluid\"],[13],[0,\"\\n    \"],[11,\"div\",[]],[15,\"class\",\"pull-right action-buttons-div\"],[13],[0,\"\\n      \"],[6,[\"link-to\"],[\"rentals.new\",[28,[\"rental\"]]],[[\"class\",\"data-test-rental-new-btn\"],[\"btn btn-info\",true]],{\"statements\":[[1,[33,[\"t\"],[\"rental.actions.new_rental\"],null],false]],\"locals\":[]},null],[0,\"\\n    \"],[14],[0,\"\\n  \"],[14],[0,\"\\n\"]],\"locals\":[]},null],[0,\"\\n\"],[11,\"div\",[]],[15,\"class\",\"row-fluid filters\"],[13],[0,\"\\n  \"],[11,\"div\",[]],[15,\"class\",\"col-md-2\"],[13],[0,\"\\n    \"],[1,[33,[\"input\"],null,[[\"value\",\"placeholder\",\"data-test-rental-rental-filter-field\"],[[28,[\"rentalFilter\"]],\"Rental\",true]]],false],[0,\"\\n  \"],[14],[0,\"\\n\\n\"],[6,[\"if\"],[[33,[\"can\"],[\"see user booking\"],null]],null,{\"statements\":[[0,\"    \"],[11,\"div\",[]],[15,\"class\",\"col-md-3\"],[13],[0,\"\\n\"],[6,[\"power-select\"],null,[[\"options\",\"selected\",\"allowClear\",\"placeholder\",\"onchange\"],[[28,[\"allUsersExceptMe\"]],[28,[\"userFilterObj\"]],true,[33,[\"t\"],[\"rental.filter.user\"],null],[33,[\"action\"],[[28,[null]],\"selectUserFilter\"],null]]],{\"statements\":[[0,\"      \"],[1,[28,[\"user\",\"email\"]],false],[0,\"\\n\"]],\"locals\":[\"user\"]},null],[0,\"    \"],[14],[0,\"\\n\"]],\"locals\":[]},null],[0,\"\\n  \"],[11,\"div\",[]],[15,\"class\",\"col-md-5\"],[13],[0,\"\\n    \"],[11,\"div\",[]],[15,\"class\",\"col-md-3\"],[13],[0,\"\\n      \"],[11,\"span\",[]],[13],[1,[33,[\"t\"],[\"rental.filter.price_range\"],null],false],[14],[0,\"\\n    \"],[14],[0,\"\\n    \"],[11,\"div\",[]],[15,\"class\",\"col-md-8\"],[13],[0,\"\\n      \"],[1,[33,[\"range-slider\"],null,[[\"value\",\"mood\",\"changed\",\"tooltip\",\"tooltipPosition\",\"min\",\"step\",\"max\"],[[28,[\"defaultPriceRange\"]],\"success\",\"priceFilterChange\",\"show\",\"top\",0,1,[28,[\"defaultMaxDailyRate\"]]]]],false],[0,\"\\n      \"],[14],[0,\"\\n  \"],[14],[0,\"\\n\"],[14],[0,\"\\n\\n\"],[6,[\"x-table\"],null,[[\"columns\",\"sortableFields\",\"modelName\",\"sortField\",\"sortDirection\"],[[28,[\"availableColumns\"]],[28,[\"availableColumns\"]],\"rental\",[28,[\"sortField\"]],[28,[\"sortDirection\"]]]],{\"statements\":[[6,[\"if\"],[[28,[\"rentals\",\"isPending\"]]],null,{\"statements\":[[0,\"    \"],[1,[26,[\"x-loading\"]],false],[0,\"\\n\"]],\"locals\":[]},{\"statements\":[[6,[\"each\"],[[28,[\"rentals\"]]],null,{\"statements\":[[0,\"      \"],[11,\"tr\",[]],[15,\"data-test-rental-tr\",\"\"],[13],[0,\"\\n        \"],[11,\"td\",[]],[13],[0,\"\\n          \"],[1,[28,[\"rental\",\"name\"]],false],[0,\"\\n        \"],[14],[0,\"\\n\\n\"],[6,[\"if\"],[[28,[\"canShowToAdmin\"]]],null,{\"statements\":[[0,\"          \"],[11,\"td\",[]],[13],[0,\"\\n            \"],[1,[28,[\"rental\",\"user\",\"email\"]],false],[0,\"\\n          \"],[14],[0,\"\\n\"]],\"locals\":[]},null],[0,\"\\n        \"],[11,\"td\",[]],[13],[0,\"\\n          \"],[1,[33,[\"format-money\"],[[28,[\"rental\",\"dailyRate\"]]],null],false],[0,\"\\n        \"],[14],[0,\"\\n\\n        \"],[11,\"td\",[]],[13],[0,\"\\n\"],[6,[\"if\"],[[33,[\"can\"],[\"book rental\",[28,[\"rental\"]]],null]],null,{\"statements\":[[0,\"            \"],[11,\"a\",[]],[15,\"href\",\"#\"],[15,\"data-test-rental-book-btn\",\"\"],[16,\"title\",[33,[\"t\"],[\"rental.tips.book\"],null],null],[5,[\"action\"],[[28,[null]],\"book\",[28,[\"rental\"]]]],[13],[1,[33,[\"fa-icon\"],[\"shopping-cart\"],null],false],[14],[0,\"\\n\"]],\"locals\":[]},null],[0,\"\\n\"],[6,[\"if\"],[[33,[\"can\"],[\"edit rental\",[28,[\"rental\"]]],null]],null,{\"statements\":[[0,\"            \"],[6,[\"link-to\"],[\"rentals.edit\",[28,[\"rental\"]]],[[\"class\",\"data-test-rental-edit-btn\"],[\"edit-btn\",true]],{\"statements\":[[0,\" \"],[1,[33,[\"fa-icon\"],[\"pencil\"],null],false]],\"locals\":[]},null],[0,\"\\n\"]],\"locals\":[]},null],[0,\"\\n\"],[6,[\"if\"],[[33,[\"can\"],[\"delete rental\",[28,[\"rental\"]]],null]],null,{\"statements\":[[0,\"            \"],[11,\"a\",[]],[15,\"href\",\"#\"],[15,\"data-test-rental-delete-btn\",\"\"],[16,\"title\",[33,[\"t\"],[\"rental.tips.delete\"],null],null],[5,[\"action\"],[[28,[null]],\"delete\",[28,[\"rental\"]]]],[13],[1,[33,[\"fa-icon\"],[\"remove\"],null],false],[14],[0,\"\\n\"]],\"locals\":[]},null],[0,\"        \"],[14],[0,\"\\n      \"],[14],[0,\"\\n\"]],\"locals\":[\"rental\"]},null]],\"locals\":[]}]],\"locals\":[]},null],[0,\"\\n\"],[1,[33,[\"x-paginator\"],null,[[\"content\",\"changePage\",\"page\"],[[28,[\"rentals\"]],[33,[\"action\"],[[28,[null]],[33,[\"mut\"],[[28,[\"page\"]]],null]],null],[28,[\"page\"]]]]],false],[0,\"\\n\\n\"],[6,[\"if\"],[[28,[\"isShowingBookingModal\"]]],null,{\"statements\":[[0,\"  \"],[1,[33,[\"x-booking-rental\"],null,[[\"rental\",\"isShowingBookingModal\"],[[28,[\"selectedRental\"]],[28,[\"isShowingBookingModal\"]]]]],false],[0,\"\\n\"]],\"locals\":[]},null],[0,\"\\n\"],[1,[26,[\"outlet\"]],false],[0,\"\\n\"]],\"locals\":[],\"named\":[],\"yields\":[],\"hasPartials\":false}", "meta": { "moduleName": "bs-client/pods/rentals/template.hbs" } });
 });
 define('bs-client/pods/sign-in/route', ['exports', 'bs-client/mixins/current-user'], function (exports, _currentUser) {
   'use strict';
@@ -5441,7 +5774,6 @@ define('bs-client/serializers/application', ['exports', 'active-model-adapter'],
         return this._super(record, json, key, attribute);
       }
     },
-
     serializeBelongsTo: function serializeBelongsTo(record, json, relationship) {
       if (!relationship.options.readOnly) {
         return this._super(record, json, relationship);
@@ -5607,14 +5939,26 @@ define('bs-client/services/keyboard', ['exports', 'ember-keyboard/services/keybo
     }
   });
 });
-define('bs-client/services/modal-dialog', ['exports', 'ember-modal-dialog/services/modal-dialog', 'bs-client/config/environment'], function (exports, _modalDialog, _environment) {
+define('bs-client/services/modal-dialog', ['exports', 'bs-client/config/environment'], function (exports, _environment) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  var computed = Ember.computed;
-  exports.default = _modalDialog.default.extend({
+  var computed = Ember.computed,
+      Service = Ember.Service;
+
+
+  function computedFromConfig(prop) {
+    return computed(function () {
+      return _environment.default['ember-modal-dialog'] && _environment.default['ember-modal-dialog'][prop];
+    });
+  }
+
+  exports.default = Service.extend({
+    hasEmberTether: computedFromConfig('hasEmberTether'),
+    hasLiquidWormhole: computedFromConfig('hasLiquidWormhole'),
+    hasLiquidTether: computedFromConfig('hasLiquidTether'),
     destinationElementId: computed(function () {
       /*
         everywhere except test, this property will be overwritten
@@ -5667,14 +6011,15 @@ define('bs-client/services/modal-manager', ['exports'], function (exports) {
     }
   });
 });
-define('bs-client/services/moment', ['exports', 'bs-client/config/environment', 'ember-moment/services/moment'], function (exports, _environment, _moment) {
+define('bs-client/services/moment', ['exports', 'ember-moment/services/moment', 'bs-client/config/environment'], function (exports, _moment, _environment) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
+  var get = Ember.get;
   exports.default = _moment.default.extend({
-    defaultFormat: Ember.get(_environment.default, 'moment.outputFormat')
+    defaultFormat: get(_environment.default, 'moment.outputFormat')
   });
 });
 define('bs-client/services/notification-messages-service', ['exports', 'ember-cli-notifications/services/notification-messages-service'], function (exports, _notificationMessagesService) {
@@ -5981,19 +6326,6 @@ define("bs-client/templates/components/form-element/vertical/textarea", ["export
   });
   exports.default = Ember.HTMLBars.template({ "id": "igCqOxzi", "block": "{\"statements\":[[6,[\"if\"],[[28,[\"hasLabel\"]]],null,{\"statements\":[[0,\"    \"],[11,\"label\",[]],[16,\"class\",[34,[\"control-label \",[33,[\"if\"],[[28,[\"invisibleLabel\"]],\"sr-only\"],null]]]],[16,\"for\",[34,[[26,[\"formElementId\"]]]]],[13],[1,[26,[\"label\"]],false],[14],[0,\"\\n\"]],\"locals\":[]},null],[1,[33,[\"bs-textarea\"],null,[[\"id\",\"value\",\"name\",\"placeholder\",\"autofocus\",\"disabled\",\"required\",\"cols\",\"rows\"],[[28,[\"formElementId\"]],[28,[\"value\"]],[28,[\"name\"]],[28,[\"placeholder\"]],[28,[\"autofocus\"]],[28,[\"disabled\"]],[28,[\"required\"]],[28,[\"cols\"]],[28,[\"rows\"]]]]],false],[0,\"\\n\"],[19,\"components/form-element/feedback-icon\"],[0,\"\\n\"],[19,\"components/form-element/errors\"],[0,\"\\n\"]],\"locals\":[],\"named\":[],\"yields\":[],\"hasPartials\":true}", "meta": { "moduleName": "bs-client/templates/components/form-element/vertical/textarea.hbs" } });
 });
-define('bs-client/templates/components/modal-dialog', ['exports', 'ember-modal-dialog/templates/components/modal-dialog'], function (exports, _modalDialog) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  Object.defineProperty(exports, 'default', {
-    enumerable: true,
-    get: function () {
-      return _modalDialog.default;
-    }
-  });
-});
 define("bs-client/templates/components/models-table/all-columns-hidden", ["exports"], function (exports) {
   "use strict";
 
@@ -6122,19 +6454,6 @@ define("bs-client/templates/components/models-table/table-footer", ["exports"], 
   });
   exports.default = Ember.HTMLBars.template({ "id": "wKurnry6", "block": "{\"statements\":[],\"locals\":[],\"named\":[],\"yields\":[],\"hasPartials\":false}", "meta": { "moduleName": "bs-client/templates/components/models-table/table-footer.hbs" } });
 });
-define('bs-client/templates/components/tether-dialog', ['exports', 'ember-modal-dialog/templates/components/tether-dialog'], function (exports, _tetherDialog) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  Object.defineProperty(exports, 'default', {
-    enumerable: true,
-    get: function () {
-      return _tetherDialog.default;
-    }
-  });
-});
 define("bs-client/templates/components/x-loading", ["exports"], function (exports) {
   "use strict";
 
@@ -6149,7 +6468,7 @@ define("bs-client/templates/components/x-login-form", ["exports"], function (exp
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "sEm5o6kY", "block": "{\"statements\":[[11,\"div\",[]],[15,\"id\",\"loginbox\"],[15,\"style\",\"margin-top:50px;\"],[15,\"class\",\"mainbox col-md-8 col-md-offset-2\"],[13],[0,\"\\n  \"],[11,\"div\",[]],[15,\"class\",\"panel panel-info\"],[13],[0,\"\\n    \"],[11,\"div\",[]],[15,\"class\",\"panel-heading\"],[13],[0,\"\\n      \"],[11,\"div\",[]],[15,\"class\",\"panel-title\"],[13],[1,[33,[\"t\"],[\"landing.login\"],null],false],[14],[0,\"\\n    \"],[14],[0,\"\\n\\n    \"],[11,\"div\",[]],[15,\"class\",\"panel-body\"],[13],[0,\"\\n      \"],[11,\"div\",[]],[15,\"style\",\"display:none\"],[15,\"id\",\"login-alert\"],[15,\"class\",\"alert alert-danger col-sm-12\"],[13],[14],[0,\"\\n        \"],[11,\"form\",[]],[5,[\"action\"],[[28,[null]],\"authenticate\"],[[\"on\",\"class\"],[\"submit\",\"form-horizontal\"]]],[13],[0,\"\\n          \"],[11,\"div\",[]],[15,\"style\",\"margin-bottom: 25px\"],[15,\"class\",\"input-group\"],[13],[0,\"\\n            \"],[11,\"span\",[]],[15,\"class\",\"input-group-addon\"],[13],[11,\"i\",[]],[15,\"class\",\"glyphicon glyphicon-user\"],[13],[14],[14],[0,\"\\n            \"],[1,[33,[\"input\"],null,[[\"type\",\"id\",\"class\",\"placeholder\",\"value\",\"autofocus\",\"enter\"],[\"email\",\"identification\",\"form-control\",[33,[\"t\"],[\"landing.enter_email\"],null],[28,[\"identification\"]],\"autofocus\",\"authenticate\"]]],false],[0,\"\\n          \"],[14],[0,\"\\n\\n          \"],[11,\"div\",[]],[15,\"style\",\"margin-bottom: 25px\"],[15,\"class\",\"input-group\"],[13],[0,\"\\n            \"],[11,\"span\",[]],[15,\"class\",\"input-group-addon\"],[13],[11,\"i\",[]],[15,\"class\",\"glyphicon glyphicon-lock\"],[13],[14],[14],[0,\"\\n            \"],[1,[33,[\"input\"],null,[[\"id\",\"class\",\"placeholder\",\"type\",\"value\",\"enter\"],[\"password\",\"form-control\",[33,[\"t\"],[\"landing.enter_password\"],null],\"password\",[28,[\"password\"]],\"authenticate\"]]],false],[0,\"\\n          \"],[14],[0,\"\\n\\n          \"],[11,\"div\",[]],[15,\"style\",\"margin-top:10px\"],[15,\"class\",\"form-group\"],[13],[0,\"\\n            \"],[11,\"div\",[]],[15,\"class\",\"col-sm-12 controls\"],[13],[0,\"\\n              \"],[11,\"button\",[]],[15,\"type\",\"button\"],[15,\"id\",\"btn-login\"],[15,\"class\",\"btn btn-success\"],[5,[\"action\"],[[28,[null]],\"authenticate\"]],[13],[1,[33,[\"t\"],[\"landing.login\"],null],false],[14],[0,\"\\n            \"],[14],[0,\"\\n          \"],[14],[0,\"\\n\\n          \"],[11,\"div\",[]],[15,\"class\",\"form-group\"],[13],[0,\"\\n            \"],[11,\"div\",[]],[15,\"class\",\"col-md-12 control\"],[13],[0,\"\\n              \"],[11,\"div\",[]],[15,\"style\",\"border-top: 1px solid#888; padding-top:15px; font-size:85%\"],[13],[0,\"\\n\"],[6,[\"link-to\"],[\"sign_up\"],[[\"class\"],[\"button button-default button-block int-landing-create-account\"]],{\"statements\":[[0,\"                  \"],[1,[33,[\"t\"],[\"landing.create_account\"],null],false],[0,\"\\n\"]],\"locals\":[]},null],[0,\"              \"],[14],[0,\"\\n            \"],[14],[0,\"\\n          \"],[14],[0,\"\\n        \"],[14],[0,\"\\n    \"],[14],[0,\"\\n  \"],[14],[0,\"\\n\"],[14],[0,\"\\n\"]],\"locals\":[],\"named\":[],\"yields\":[],\"hasPartials\":false}", "meta": { "moduleName": "bs-client/templates/components/x-login-form.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "Oyy/mHPX", "block": "{\"statements\":[[11,\"div\",[]],[15,\"id\",\"loginbox\"],[15,\"style\",\"margin-top:50px;\"],[15,\"class\",\"mainbox col-md-8 col-md-offset-2\"],[13],[0,\"\\n  \"],[11,\"div\",[]],[15,\"class\",\"panel panel-info\"],[13],[0,\"\\n    \"],[11,\"div\",[]],[15,\"class\",\"panel-heading\"],[13],[0,\"\\n      \"],[11,\"div\",[]],[15,\"class\",\"panel-title\"],[13],[1,[33,[\"t\"],[\"landing.login\"],null],false],[14],[0,\"\\n    \"],[14],[0,\"\\n\\n    \"],[11,\"div\",[]],[15,\"class\",\"panel-body\"],[13],[0,\"\\n      \"],[11,\"div\",[]],[15,\"style\",\"display:none\"],[15,\"id\",\"login-alert\"],[15,\"class\",\"alert alert-danger col-sm-12\"],[13],[14],[0,\"\\n        [[\"],[1,[26,[\"abc\"]],false],[0,\"]]-\\n        \"],[11,\"form\",[]],[5,[\"action\"],[[28,[null]],\"authenticate\"],[[\"on\",\"class\"],[\"submit\",\"form-horizontal\"]]],[13],[0,\"\\n          \"],[11,\"div\",[]],[15,\"style\",\"margin-bottom: 25px\"],[15,\"class\",\"input-group\"],[13],[0,\"\\n            \"],[11,\"span\",[]],[15,\"class\",\"input-group-addon\"],[13],[11,\"i\",[]],[15,\"class\",\"glyphicon glyphicon-user\"],[13],[14],[14],[0,\"\\n            \"],[1,[33,[\"input\"],null,[[\"type\",\"id\",\"class\",\"placeholder\",\"value\",\"autofocus\",\"enter\",\"data-test-signin-email-field\"],[\"email\",\"identification\",\"form-control\",[33,[\"t\"],[\"landing.enter_email\"],null],[28,[\"identification\"]],\"autofocus\",\"authenticate\",true]]],false],[0,\"\\n          \"],[14],[0,\"\\n\\n          \"],[11,\"div\",[]],[15,\"style\",\"margin-bottom: 25px\"],[15,\"class\",\"input-group\"],[13],[0,\"\\n            \"],[11,\"span\",[]],[15,\"class\",\"input-group-addon\"],[13],[11,\"i\",[]],[15,\"class\",\"glyphicon glyphicon-lock\"],[13],[14],[14],[0,\"\\n            \"],[1,[33,[\"input\"],null,[[\"id\",\"class\",\"placeholder\",\"type\",\"value\",\"enter\",\"data-test-signin-password-field\"],[\"password\",\"form-control\",[33,[\"t\"],[\"landing.enter_password\"],null],\"password\",[28,[\"password\"]],\"authenticate\",true]]],false],[0,\"\\n          \"],[14],[0,\"\\n\\n          \"],[11,\"div\",[]],[15,\"style\",\"margin-top:10px\"],[15,\"class\",\"form-group\"],[13],[0,\"\\n            \"],[11,\"div\",[]],[15,\"class\",\"col-sm-12 controls\"],[13],[0,\"\\n              \"],[11,\"button\",[]],[15,\"type\",\"button\"],[15,\"data-test-signin-submit-btn\",\"\"],[15,\"id\",\"btn-login\"],[15,\"class\",\"btn btn-success\"],[5,[\"action\"],[[28,[null]],\"authenticate\"]],[13],[1,[33,[\"t\"],[\"landing.login\"],null],false],[14],[0,\"\\n            \"],[14],[0,\"\\n          \"],[14],[0,\"\\n\\n          \"],[11,\"div\",[]],[15,\"class\",\"form-group\"],[13],[0,\"\\n            \"],[11,\"div\",[]],[15,\"class\",\"col-md-12 control\"],[13],[0,\"\\n              \"],[11,\"div\",[]],[15,\"style\",\"border-top: 1px solid#888; padding-top:15px; font-size:85%\"],[13],[0,\"\\n\"],[6,[\"link-to\"],[\"sign_up\"],[[\"class\"],[\"button button-default button-block int-landing-create-account\"]],{\"statements\":[[0,\"                  \"],[1,[33,[\"t\"],[\"landing.create_account\"],null],false],[0,\"\\n\"]],\"locals\":[]},null],[0,\"              \"],[14],[0,\"\\n            \"],[14],[0,\"\\n          \"],[14],[0,\"\\n        \"],[14],[0,\"\\n    \"],[14],[0,\"\\n  \"],[14],[0,\"\\n\"],[14],[0,\"\\n\"]],\"locals\":[],\"named\":[],\"yields\":[],\"hasPartials\":false}", "meta": { "moduleName": "bs-client/templates/components/x-login-form.hbs" } });
 });
 define("bs-client/templates/components/x-navigation", ["exports"], function (exports) {
   "use strict";
@@ -6157,7 +6476,7 @@ define("bs-client/templates/components/x-navigation", ["exports"], function (exp
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "DFvCHAQf", "block": "{\"statements\":[[11,\"nav\",[]],[15,\"class\",\"navbar navbar-default\"],[15,\"role\",\"navigation\"],[13],[0,\"\\n  \"],[4,\" Brand and toggle get grouped for better mobile display \"],[0,\"\\n  \"],[11,\"div\",[]],[15,\"class\",\"navbar-header\"],[13],[0,\"\\n    \"],[11,\"button\",[]],[15,\"type\",\"button\"],[15,\"class\",\"navbar-toggle\"],[15,\"data-toggle\",\"collapse\"],[15,\"data-target\",\"#bs-example-navbar-collapse-1\"],[13],[0,\"\\n      \"],[11,\"span\",[]],[15,\"class\",\"sr-only\"],[13],[0,\"Toggle navigation\"],[14],[0,\" \"],[11,\"span\",[]],[15,\"class\",\"icon-bar\"],[13],[14],[11,\"span\",[]],[15,\"class\",\"icon-bar\"],[13],[14],[11,\"span\",[]],[15,\"class\",\"icon-bar\"],[13],[14],[0,\"\\n    \"],[14],[0,\"\\n    \"],[11,\"a\",[]],[15,\"class\",\"navbar-brand\"],[15,\"href\",\"http://bs-client.herokuapp.com\"],[13],[0,\"Adrian - BookingSync\"],[14],[0,\"\\n  \"],[14],[0,\"\\n\\n  \"],[11,\"div\",[]],[15,\"class\",\"collapse navbar-collapse\"],[15,\"id\",\"bs-example-navbar-collapse-1\"],[13],[0,\"\\n    \"],[11,\"ul\",[]],[15,\"class\",\"nav navbar-nav\"],[13],[0,\"\\n      \"],[11,\"li\",[]],[13],[0,\"\\n\"],[6,[\"link-to\"],[\"rentals\"],null,{\"statements\":[[0,\"          \"],[11,\"span\",[]],[15,\"class\",\"glyphicon glyphicon-home\"],[13],[14],[0,\"Rentals list\\n\"]],\"locals\":[]},null],[0,\"      \"],[14],[0,\"\\n\\n      \"],[11,\"li\",[]],[13],[0,\"\\n\"],[6,[\"link-to\"],[\"bookings\"],null,{\"statements\":[[0,\"          \"],[11,\"span\",[]],[15,\"class\",\"glyphicon glyphicon-shopping-cart\"],[13],[14],[0,\"Bookings list\\n\"]],\"locals\":[]},null],[0,\"      \"],[14],[0,\"\\n\\n\"],[6,[\"bs-dropdown\"],null,[[\"tagName\"],[\"li\"]],{\"statements\":[[6,[\"bs-dropdown-toggle\"],null,null,{\"statements\":[[0,\"          \"],[11,\"span\",[]],[15,\"class\",\"glyphicon glyphicon-wrench\"],[13],[14],[0,\"Actions \"],[11,\"span\",[]],[15,\"class\",\"caret\"],[13],[14],[0,\"\\n\"]],\"locals\":[]},null],[6,[\"bs-dropdown-menu\"],null,null,{\"statements\":[[0,\"          \"],[11,\"li\",[]],[13],[0,\"\\n\"],[6,[\"link-to\"],[\"rentals.new\"],null,{\"statements\":[[0,\"              New rental\\n\"]],\"locals\":[]},null],[0,\"          \"],[14],[0,\"\\n          \"],[11,\"li\",[]],[13],[0,\"\\n\"],[6,[\"link-to\"],[\"rentals\"],null,{\"statements\":[[0,\"              Upload CSV\\n\"]],\"locals\":[]},null],[0,\"          \"],[14],[0,\"\\n\"]],\"locals\":[]},null]],\"locals\":[]},null],[0,\"    \"],[14],[0,\"\\n\\n    \"],[11,\"ul\",[]],[15,\"class\",\"nav navbar-nav navbar-right\"],[13],[0,\"\\n\"],[6,[\"bs-dropdown\"],null,[[\"tagName\"],[\"li\"]],{\"statements\":[[6,[\"bs-dropdown-toggle\"],null,null,{\"statements\":[[0,\"         \"],[11,\"span\",[]],[15,\"class\",\"glyphicon glyphicon-user\"],[13],[14],[1,[26,[\"userEmail\"]],false],[0,\" \"],[11,\"span\",[]],[15,\"class\",\"caret\"],[13],[14],[0,\"\\n\"]],\"locals\":[]},null],[0,\"\\n\"],[6,[\"bs-dropdown-menu\"],null,null,{\"statements\":[[0,\"          \"],[11,\"li\",[]],[13],[0,\"\\n            \"],[11,\"a\",[]],[15,\"href\",\"#\"],[5,[\"action\"],[[28,[null]],\"invalidateSession\"]],[13],[11,\"span\",[]],[15,\"class\",\"glyphicon glyphicon-off\"],[13],[14],[0,\"Logout\"],[14],[0,\"\\n          \"],[14],[0,\"\\n\"]],\"locals\":[]},null]],\"locals\":[]},null],[0,\"    \"],[14],[0,\"\\n  \"],[14],[0,\"\\n\"],[14],[0,\"\\n\"]],\"locals\":[],\"named\":[],\"yields\":[],\"hasPartials\":false}", "meta": { "moduleName": "bs-client/templates/components/x-navigation.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "imwukqUL", "block": "{\"statements\":[[11,\"nav\",[]],[15,\"class\",\"navbar navbar-default\"],[15,\"role\",\"navigation\"],[13],[0,\"\\n  \"],[4,\" Brand and toggle get grouped for better mobile display \"],[0,\"\\n  \"],[11,\"div\",[]],[15,\"class\",\"navbar-header\"],[13],[0,\"\\n    \"],[11,\"button\",[]],[15,\"type\",\"button\"],[15,\"class\",\"navbar-toggle\"],[15,\"data-toggle\",\"collapse\"],[15,\"data-target\",\"#bs-example-navbar-collapse-1\"],[13],[0,\"\\n      \"],[11,\"span\",[]],[15,\"class\",\"sr-only\"],[13],[0,\"Toggle navigation\"],[14],[0,\" \"],[11,\"span\",[]],[15,\"class\",\"icon-bar\"],[13],[14],[11,\"span\",[]],[15,\"class\",\"icon-bar\"],[13],[14],[11,\"span\",[]],[15,\"class\",\"icon-bar\"],[13],[14],[0,\"\\n    \"],[14],[0,\"\\n    \"],[11,\"a\",[]],[15,\"class\",\"navbar-brand\"],[15,\"href\",\"http://bs-client.herokuapp.com\"],[13],[0,\"Adrian - BookingSync\"],[14],[0,\"\\n  \"],[14],[0,\"\\n\\n  \"],[11,\"div\",[]],[15,\"class\",\"collapse navbar-collapse\"],[15,\"id\",\"bs-example-navbar-collapse-1\"],[13],[0,\"\\n    \"],[11,\"ul\",[]],[15,\"class\",\"nav navbar-nav\"],[13],[0,\"\\n      \"],[11,\"li\",[]],[13],[0,\"\\n\"],[6,[\"link-to\"],[\"rentals\"],null,{\"statements\":[[0,\"          \"],[11,\"span\",[]],[15,\"class\",\"glyphicon glyphicon-home\"],[13],[14],[0,\"Rentals list\\n\"]],\"locals\":[]},null],[0,\"      \"],[14],[0,\"\\n\\n      \"],[11,\"li\",[]],[13],[0,\"\\n\"],[6,[\"link-to\"],[\"bookings\"],null,{\"statements\":[[0,\"          \"],[11,\"span\",[]],[15,\"class\",\"glyphicon glyphicon-shopping-cart\"],[13],[14],[0,\"Bookings list\\n\"]],\"locals\":[]},null],[0,\"      \"],[14],[0,\"\\n\\n\"],[6,[\"bs-dropdown\"],null,[[\"tagName\"],[\"li\"]],{\"statements\":[[6,[\"bs-dropdown-toggle\"],null,null,{\"statements\":[[0,\"          \"],[11,\"span\",[]],[15,\"class\",\"glyphicon glyphicon-wrench\"],[13],[14],[0,\"Actions \"],[11,\"span\",[]],[15,\"class\",\"caret\"],[13],[14],[0,\"\\n\"]],\"locals\":[]},null],[6,[\"bs-dropdown-menu\"],null,null,{\"statements\":[[0,\"          \"],[11,\"li\",[]],[13],[0,\"\\n\"],[6,[\"link-to\"],[\"rentals.new\"],null,{\"statements\":[[0,\"              New rental\\n\"]],\"locals\":[]},null],[0,\"          \"],[14],[0,\"\\n          \"],[11,\"li\",[]],[13],[0,\"\\n\"],[6,[\"link-to\"],[\"rentals\"],null,{\"statements\":[[0,\"              Upload CSV\\n\"]],\"locals\":[]},null],[0,\"          \"],[14],[0,\"\\n\"]],\"locals\":[]},null]],\"locals\":[]},null],[0,\"    \"],[14],[0,\"\\n\\n    \"],[11,\"ul\",[]],[15,\"class\",\"nav navbar-nav navbar-right\"],[13],[0,\"\\n\"],[6,[\"bs-dropdown\"],null,[[\"tagName\"],[\"li\"]],{\"statements\":[[6,[\"bs-dropdown-toggle\"],null,null,{\"statements\":[[0,\"         \"],[11,\"span\",[]],[15,\"class\",\"glyphicon glyphicon-user\"],[13],[14],[1,[26,[\"userEmail\"]],false],[0,\" \"],[11,\"span\",[]],[15,\"class\",\"caret\"],[13],[14],[0,\"\\n\"]],\"locals\":[]},null],[0,\"\\n\"],[6,[\"bs-dropdown-menu\"],null,null,{\"statements\":[[0,\"          \"],[11,\"li\",[]],[13],[0,\"\\n            \"],[11,\"a\",[]],[15,\"data-test-signout-link\",\"\"],[15,\"href\",\"#\"],[5,[\"action\"],[[28,[null]],\"invalidateSession\"]],[13],[11,\"span\",[]],[15,\"class\",\"glyphicon glyphicon-off\"],[13],[14],[0,\"Logout\"],[14],[0,\"\\n          \"],[14],[0,\"\\n\"]],\"locals\":[]},null]],\"locals\":[]},null],[0,\"    \"],[14],[0,\"\\n  \"],[14],[0,\"\\n\"],[14],[0,\"\\n\"]],\"locals\":[],\"named\":[],\"yields\":[],\"hasPartials\":false}", "meta": { "moduleName": "bs-client/templates/components/x-navigation.hbs" } });
 });
 define("bs-client/templates/components/x-paginator", ["exports"], function (exports) {
   "use strict";
@@ -6199,6 +6518,76 @@ define("bs-client/templates/modal", ["exports"], function (exports) {
   });
   exports.default = Ember.HTMLBars.template({ "id": "+4FeJove", "block": "{\"statements\":[[1,[33,[\"component\"],[[28,[\"componentName\"]]],[[\"params\",\"close\"],[[28,[\"params\"]],\"close\"]]],false],[0,\"\\n\"]],\"locals\":[],\"named\":[],\"yields\":[],\"hasPartials\":false}", "meta": { "moduleName": "bs-client/templates/modal.hbs" } });
 });
+define('bs-client/tests/mirage/mirage.lint-test', [], function () {
+  'use strict';
+
+  QUnit.module('ESLint | mirage');
+
+  QUnit.test('mirage/config.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'mirage/config.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('mirage/factories/booking.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'mirage/factories/booking.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('mirage/factories/rental.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'mirage/factories/rental.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('mirage/factories/user.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'mirage/factories/user.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('mirage/models/booking.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'mirage/models/booking.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('mirage/models/me.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'mirage/models/me.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('mirage/models/permission.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'mirage/models/permission.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('mirage/models/rental.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'mirage/models/rental.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('mirage/models/user-session.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'mirage/models/user-session.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('mirage/models/user-sessions-json.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'mirage/models/user-sessions-json.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('mirage/models/user.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'mirage/models/user.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('mirage/scenarios/default.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'mirage/scenarios/default.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('mirage/serializers/application.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'mirage/serializers/application.js should pass ESLint\n\n');
+  });
+});
 define('bs-client/transforms/array', ['exports', 'ember-data'], function (exports, _emberData) {
   'use strict';
 
@@ -6237,7 +6626,6 @@ define('bs-client/transforms/object', ['exports', 'ember-data'], function (expor
         return value;
       }
     },
-
     serialize: function serialize(value) {
       if (!Ember.$.isPlainObject(value)) {
         return {};
@@ -6357,7 +6745,7 @@ define('bs-client/utils/titleize', ['exports', 'ember-cli-string-helpers/utils/t
 });
 
 
-define('bs-client/config/environment', ['ember'], function(Ember) {
+define('bs-client/config/environment', [], function() {
   var prefix = 'bs-client';
 try {
   var metaName = prefix + '/config/environment';
@@ -6377,6 +6765,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("bs-client/app")["default"].create({"LOG_TRANSITIONS":true,"LOG_TRANSITIONS_INTERNAL":true,"name":"bs-client","version":"0.0.0+a517f81d"});
+  require("bs-client/app")["default"].create({"LOG_TRANSITIONS":true,"LOG_TRANSITIONS_INTERNAL":true,"name":"bs-client","version":"0.0.0+f077b034"});
 }
 //# sourceMappingURL=bs-client.map

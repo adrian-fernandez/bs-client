@@ -6,7 +6,7 @@ export default Ember.Service.extend({
     'sign-out': () => { return '/user_sessions/'; }
   },
 
-  urlFor: function(name, args) {
+  urlFor(name, args) {
     const func = this.urls[name];
     const urlTemplate = '/api/v1' + func(args);
     return urlTemplate;

@@ -4,10 +4,10 @@ import EmberValidations from 'ember-validations';
 
 export default DS.Model.extend(EmberValidations, {
   validations: {
-    start_at: {
+    startAt: {
       presence: true
     },
-    end_at: {
+    endAt: {
       presence: true
     },
     user: {
@@ -18,26 +18,26 @@ export default DS.Model.extend(EmberValidations, {
     }
   },
 
-  start_at: DS.attr('date'),
-  end_at: DS.attr('date'),
+  startAt: DS.attr('date'),
+  endAt: DS.attr('date'),
   days: DS.attr('number', { readOnly: true }),
   price: DS.attr('number', { readOnly: true }),
 
   user: DS.belongsTo('user', { async: true }),
   rental: DS.belongsTo('rental', { async: false }),
 
-  hasStarted: Ember.computed('start_at', function() {
-    return moment(this.get('start_at')) <= moment(new Date());
+  hasStarted: Ember.computed('startAt', function() {
+    return moment(this.get('startAt')) <= moment(new Date());
   }),
 
-  hasEnded: Ember.computed('end_at', function() {
-    return moment(this.get('end_at')) <= moment(new Date());
+  hasEnded: Ember.computed('endAt', function() {
+    return moment(this.get('endAt')) <= moment(new Date());
   }),
 
-  isNow: Ember.computed('start_at', 'end_at', function() {
+  isNow: Ember.computed('startAt', 'endAt', function() {
     const today = new Date();
 
-    return moment(this.get('end_at')) > moment(today) &&
-      moment(this.get('start_at')) <= moment(today);
+    return moment(this.get('endAt')) > moment(today) &&
+      moment(this.get('startAt')) <= moment(today);
   })
 });

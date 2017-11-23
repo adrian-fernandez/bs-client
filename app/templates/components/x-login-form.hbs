@@ -6,20 +6,21 @@
 
     <div class="panel-body" >
       <div style="display:none" id="login-alert" class="alert alert-danger col-sm-12"></div>
+        [[{{abc}}]]-
         <form {{action 'authenticate' on='submit' class="form-horizontal"}}>
           <div style="margin-bottom: 25px" class="input-group">
             <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
-            {{input type="email" id='identification' class="form-control" placeholder=(t 'landing.enter_email') value=identification autofocus='autofocus' enter='authenticate'}}
+            {{input data-test-signin-email-field type="email" id='identification' class="form-control" placeholder=(t 'landing.enter_email') value=identification autofocus='autofocus' enter='authenticate'}}
           </div>
 
           <div style="margin-bottom: 25px" class="input-group">
             <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
-            {{input id='password' class="form-control" placeholder=(t 'landing.enter_password') type='password' value=password enter='authenticate'}}
+            {{input data-test-signin-password-field id='password' class="form-control" placeholder=(t 'landing.enter_password') type='password' value=password enter='authenticate'}}
           </div>
 
           <div style="margin-top:10px" class="form-group">
             <div class="col-sm-12 controls">
-              <button type="button" {{action 'authenticate'}} id="btn-login" class="btn btn-success">{{t 'landing.login'}}</button>
+              <button type="button" {{action 'authenticate'}} data-test-signin-submit-btn id="btn-login" class="btn btn-success">{{t 'landing.login'}}</button>
             </div>
           </div>
 

@@ -2,7 +2,7 @@ export default {
   name: 'injectStoreIntoComponent',
   after: 'ember-data',
 
-  initialize: function (application) {
+  initialize (application) {
     application.inject('component', 'store', 'service:store');
   }
 };

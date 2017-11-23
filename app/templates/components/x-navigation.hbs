@@ -48,7 +48,7 @@
 
         {{#bs-dropdown-menu}}
           <li>
-            <a href="#" {{action 'invalidateSession'}}><span class="glyphicon glyphicon-off"></span>Logout</a>
+            <a data-test-signout-link href="#" {{action 'invalidateSession'}}><span class="glyphicon glyphicon-off"></span>Logout</a>
           </li>
         {{/bs-dropdown-menu}}
       {{/bs-dropdown}}

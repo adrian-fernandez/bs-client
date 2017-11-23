@@ -40,7 +40,7 @@
            sortField=sortField
            sortDirection=sortDirection}}
   {{#each bookings as |booking|}}
-    <tr class="{{if booking.hasEnded 'ended-booking' ''}} {{if booking.isNow 'active-booking' ''}}">
+    <tr data-test-booking-tr class="{{if booking.hasEnded 'ended-booking' ''}} {{if booking.isNow 'active-booking' ''}}">
       <td>
         {{booking.rental.name}}
       </td>
@@ -51,29 +51,29 @@
         </td>
       {{/if}}
 
-      <td>
-        {{format-date booking.start_at locale='fr'}}
+      <td data-test-booking-start-at-td>
+        {{format-date booking.startAt locale='fr'}}
       </td>
 
-      <td>
-        {{format-date booking.end_at locale='fr'}}
+      <td data-test-booking-end-at-td>
+        {{format-date booking.endAt locale='fr'}}
       </td>
 
       <td>
         {{booking.days}}
       </td>
 
-      <td>
+      <td data-test-booking-price-td>
         {{format-money booking.price}}
       </td>
 
       <td>
         {{#if (can 'edit booking' booking)}}
-          {{#link-to "bookings.edit" booking}}{{fa-icon 'pencil'}}{{/link-to}}
+          {{#link-to "bookings.edit" booking data-test-booking-edit-btn}}{{fa-icon 'pencil'}}{{/link-to}}
         {{/if}}
 
         {{#if (can 'delete booking' booking)}}
-          <a href='#' {{action 'delete' booking}} title={{t 'booking.tips.delete'}}>{{fa-icon 'remove'}}</a>
+          <a href='#' data-test-booking-delete-btn {{action 'delete' booking}} title={{t 'booking.tips.delete'}}>{{fa-icon 'remove'}}</a>
         {{/if}}
       </td>
     </tr>

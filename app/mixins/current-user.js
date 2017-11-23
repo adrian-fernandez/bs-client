@@ -40,8 +40,8 @@ export default Ember.Mixin.create({
     const redirect = transition || true;
 
     this.get('session').authenticate('authenticator:devise', identification, password).then(() => {
-      const data = this.get('session.session.content'),
-        token = data.authenticated.session.access_token;
+      const data = this.get('session.session.content');
+      const token = data.authenticated.session.access_token;
 
       return this.get('currentUser').load(token).then(() => {
         let redirectUri = this.get('permissions').accessibleLink();

@@ -1,14 +1,14 @@
 {{#if (can 'create rental')}}
   <div class="row-fluid">
     <div class="pull-right action-buttons-div">
-      {{#link-to 'rentals.new' class='btn btn-info'}}{{t 'rental.actions.new_rental'}}{{/link-to}}
+      {{#link-to 'rentals.new' rental data-test-rental-new-btn class='btn btn-info'}}{{t 'rental.actions.new_rental'}}{{/link-to}}
     </div>
   </div>
 {{/if}}
 
 <div class="row-fluid filters">
   <div class="col-md-2">
-    {{input value=rentalFilter placeholder='Rental'}}
+    {{input data-test-rental-rental-filter-field value=rentalFilter placeholder='Rental'}}
   </div>
 
   {{#if (can 'see user booking')}}
@@ -50,7 +50,7 @@
     {{x-loading}}
   {{else}}
     {{#each rentals as |rental|}}
-      <tr>
+      <tr data-test-rental-tr>
         <td>
           {{rental.name}}
         </td>
@@ -67,15 +67,15 @@
 
         <td>
           {{#if (can 'book rental' rental)}}
-            <a href='#' {{action 'book' rental}} title={{t 'rental.tips.book'}}>{{fa-icon 'shopping-cart'}}</a>
+            <a href='#' {{action 'book' rental}} data-test-rental-book-btn title={{t 'rental.tips.book'}}>{{fa-icon 'shopping-cart'}}</a>
           {{/if}}
 
           {{#if (can 'edit rental' rental)}}
-            {{#link-to "rentals.edit" rental}}{{fa-icon 'pencil'}}{{/link-to}}
+            {{#link-to "rentals.edit" rental data-test-rental-edit-btn class='edit-btn'}} {{fa-icon 'pencil'}}{{/link-to}}
           {{/if}}
 
           {{#if (can 'delete rental' rental)}}
-            <a href='#' {{action 'delete' rental}} title={{t 'rental.tips.delete'}}>{{fa-icon 'remove'}}</a>
+            <a href='#' data-test-rental-delete-btn {{action 'delete' rental}} title={{t 'rental.tips.delete'}}>{{fa-icon 'remove'}}</a>
           {{/if}}
         </td>
       </tr>

@@ -3,6 +3,8 @@ import DS from 'ember-data';
 import ErrorGenerator from 'bs-client/mixins/error-generator';
 
 export default Ember.Controller.extend(ErrorGenerator, {
+  pepe: 'ola',
+
   allUsersExceptMe: Ember.computed(function() {
     return this.get('store').query('user',
       {
@@ -15,20 +17,20 @@ export default Ember.Controller.extend(ErrorGenerator, {
     return this.get('rental.busyDays').toArray().map((x) => moment(x).format('D MMM. YYYY'));
   }),
 
-  canShowTo: Ember.computed.oneWay('booking.start_at'),
+  canShowTo: Ember.computed.oneWay('booking.startAt'),
 
-  canShowPrice: Ember.computed.and('booking.start_at', 'booking.end_at'),
+  canShowPrice: Ember.computed.and('booking.startAt', 'booking.endAt'),
 
   canConfirmBooking: Ember.computed.oneWay('canShowPrice'),
 
-  calculatedBookingDays: Ember.computed('booking.start_at', 'booking.end_at', function() {
-    const startDate = moment(this.get('booking.start_at')).startOf('day');
-    const endDate = moment(this.get('booking.end_at')).startOf('day');
+  calculatedBookingDays: Ember.computed('booking.startAt', 'booking.endAt', function() {
+    const startDate = moment(this.get('booking.startAt')).startOf('day');
+    const endDate = moment(this.get('booking.endAt')).startOf('day');
 
     return endDate.diff(startDate, 'days');
   }),
 
-  calculatedBookingPrice: Ember.computed('booking.start_at', 'booking.end_at', 'rental.dailyRate', function() {
+  calculatedBookingPrice: Ember.computed('booking.startAt', 'booking.endAt', 'rental.dailyRate', function() {
     return this.get('rental.dailyRate') * this.get('calculatedBookingDays');
   }),
 

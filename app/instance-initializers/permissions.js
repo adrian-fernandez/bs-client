@@ -2,7 +2,7 @@ export default {
   name: 'permissions',
   after: 'current-user',
 
-  initialize: function(appInstance) {
+  initialize(appInstance) {
     appInstance.inject('model', 'permissions', 'service:permissions');
     appInstance.inject('route', 'permissions', 'service:permissions');
     appInstance.inject('controller', 'permissions', 'service:permissions');

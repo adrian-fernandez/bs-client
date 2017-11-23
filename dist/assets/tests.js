@@ -1,5 +1,393 @@
 'use strict';
 
+define('bs-client/tests/acceptance/bookings-list-test', ['qunit', 'bs-client/tests/helpers/module-for-acceptance', 'bs-client/tests/helpers/ember-simple-auth'], function (_qunit, _moduleForAcceptance, _emberSimpleAuth) {
+  'use strict';
+
+  (0, _moduleForAcceptance.default)('Acceptance | bookings list', {
+    needs: ['model:me', 'model:user', 'model:booking', 'model:permission']
+  }); /* global server */
+
+
+  (0, _qunit.test)('requesting bookings to server', function (assert) {
+    assert.equal(1, 1);
+
+    server.get('/bookings', function (db, request) {
+      var params = request.queryParams;
+
+      assert.equal(params.date_filter, 'upcoming', 'date_filter do not match the expected ones');
+      assert.equal(params.page, 0, 'page does not match the expected one');
+      assert.equal(params.sort_direction, 'desc', 'sort_direction does not match the expected one');
+      assert.equal(params.sort_field, 'start_at', 'sort_field does not match the expected one');
+
+      return db.bookings.all();
+    });
+
+    (0, _emberSimpleAuth.authenticateSession)(this.application, { user_id: 1 });
+    visit('/bookings');
+
+    andThen(function () {
+      assert.equal(currentURL(), '/bookings');
+    });
+  });
+
+  (0, _qunit.test)('listing started bookings as admin', function (assert) {
+    var adminUser = server.create('user', 'adminUser');
+
+    (0, _emberSimpleAuth.authenticateSession)(this.application, { user_id: adminUser.id });
+
+    server.get('/bookings', function () {
+      var today = new moment(new Date());
+      var yesterday = today.add(-1, 'days');
+      var tomorrow = today.add(1, 'days');
+
+      return {
+        'rentals': [{ 'id': 1, 'name': 'Abshire LLC', 'daily_rate': 99.49, 'user_id': adminUser.id }],
+        'bookings': [{ 'id': 1, 'rental_id': 1, 'start_at': yesterday.format('YYYY/MM/DD'), 'end_at': tomorrow.format('YYYY/MM/DD'), 'days': 1, 'price': 99.49, 'user_id': adminUser.id }],
+        'users': [{ 'id': adminUser.id, 'email': adminUser.email, 'admin': adminUser.admin, 'permissions': { 'admin': true }, 'role_ids': [1] }],
+        'roles': [{ 'id': 1, 'name': 'admin' }]
+      };
+    });
+
+    server.get('/users', function () {
+      return {
+        'users': [{ 'id': adminUser.id, 'email': adminUser.email, 'admin': adminUser.admin, 'permissions': { 'admin': true }, 'role_ids': [1] }],
+        'roles': [{ 'id': 1, 'name': 'admin' }]
+      };
+    });
+
+    server.get('/users/me', function () {
+      return { user: adminUser, permissions: { 'admin': true } };
+    });
+
+    visit('/bookings');
+
+    andThen(function () {
+      assert.ok(adminUser.isAdmin, 'user should be admin');
+      assert.equal(find('[data-test-booking-tr]').length, 1, 'Admin should see 3 bookings');
+      assert.equal(find('[data-test-booking-tr]:first td').length, 7, 'Admin should see 7 columns in table');
+      assert.equal(find('[data-test-booking-edit-btn]').length, 0, 'Started bookings should not be editables');
+      assert.equal(find('[data-test-booking-delete-btn]').length, 0, 'Started bookings should not be deletables');
+    });
+  });
+
+  (0, _qunit.test)('listing bookings as admin', function (assert) {
+    var adminUser = server.create('user', 'adminUser');
+
+    (0, _emberSimpleAuth.authenticateSession)(this.application, { user_id: adminUser.id });
+
+    server.get('/bookings', function () {
+      var today = new moment(new Date());
+      var tomorrow = today.add(1, 'days');
+      var nextWeek = today.add(7, 'days');
+
+      return {
+        'rentals': [{ 'id': 1, 'name': 'Abshire LLC', 'daily_rate': 99.49, 'user_id': adminUser.id }],
+        'bookings': [{ 'id': 1, 'rental_id': 1, 'start_at': tomorrow.format('YYYY/MM/DD'), 'end_at': nextWeek.format('YYYY/MM/DD'), 'days': 7, 'price': 696.43, 'user_id': adminUser.id }],
+        'users': [{ 'id': adminUser.id, 'email': adminUser.email, 'admin': adminUser.admin, 'permissions': { 'admin': true }, 'role_ids': [1] }],
+        'roles': [{ 'id': 1, 'name': 'admin' }]
+      };
+    });
+
+    server.get('/users', function () {
+      return {
+        'users': [{ 'id': adminUser.id, 'email': adminUser.email, 'admin': adminUser.admin, 'permissions': { 'admin': true }, 'role_ids': [1] }],
+        'roles': [{ 'id': 1, 'name': 'admin' }]
+      };
+    });
+
+    server.get('/users/me', function () {
+      return { user: adminUser, permissions: { 'admin': true } };
+    });
+
+    visit('/bookings');
+
+    andThen(function () {
+      assert.ok(adminUser.isAdmin, 'user should be admin');
+      assert.equal(find('[data-test-booking-tr]').length, 1, 'Admin should see 3 bookings');
+      assert.equal(find('[data-test-booking-tr]:first td').length, 7, 'Admin should see 7 columns in table');
+      assert.equal(find('[data-test-booking-edit-btn]').length, 1, 'Admin should see edit button');
+      assert.equal(find('[data-test-booking-delete-btn]').length, 1, 'Admin should see delete button');
+    });
+  });
+
+  (0, _qunit.test)('listing bookings as owner', function (assert) {
+    var user = server.create('user', 'normalUser');
+
+    server.get('/bookings', function () {
+      var today = new moment(new Date());
+      var tomorrow = today.add(1, 'days');
+      var nextWeek = today.add(7, 'days');
+
+      return {
+        'bookings': [{ 'id': 1, 'start_at': tomorrow.format('YYYY/MM/DD'), 'end_at': nextWeek.format('YYYY/MM/DD'), 'days': 2, 'price': 20, 'user_id': user.id, 'rental_id': 1 }],
+        'rentals': [{ 'id': 1, 'name': 'Abshire LLC', 'daily_rate': 10, 'user_id': 1 }],
+        'users': [{ 'id': user.id, 'email': user.email, 'admin': user.admin, 'permissions': { 'admin': false }, 'role_ids': [1] }],
+        'roles': [{ 'id': 1, 'name': 'user' }]
+      };
+    });
+
+    (0, _emberSimpleAuth.authenticateSession)(this.application, { user_id: user.id });
+
+    server.get('/users/me', function () {
+      return { user: user, permissions: { 'admin': false } };
+    });
+
+    visit('/bookings');
+
+    andThen(function () {
+      assert.equal(find('[data-test-booking-delete-btn]').length, 1, 'Owner should see delete button');
+      assert.equal(find('[data-test-booking-edit-btn]').length, 1, 'Owner should see edit button');
+      assert.equal(find('[data-test-booking-tr]').length, 1, 'Owner should see one booking');
+      assert.equal(find('[data-test-booking-tr] td').length, 6, 'Onwer should see 6 columns in table');
+    });
+  });
+
+  (0, _qunit.test)('edit booking', function (assert) {
+    var user = server.create('user', 'normalUser');
+    var today = new moment(new Date());
+    var tomorrow = today.add(1, 'days');
+    var nextWeek = today.add(7, 'days');
+    var busyDay1 = today.add(10, 'days');
+
+    server.get('/bookings', function () {
+      return {
+        'bookings': [{ 'id': 1, 'start_at': tomorrow.format('YYYY/MM/DD'), 'end_at': nextWeek.format('YYYY/MM/DD'), 'days': 2, 'price': 20, 'user_id': user.id, 'rental_id': 1 }],
+        'rentals': [{ 'id': 1, 'name': 'Abshire LLC', 'daily_rate': 10, 'user_id': 1, 'busy_days': [busyDay1.format('YYYY/MM/DD')] }],
+        'users': [{ 'id': user.id, 'email': user.email, 'admin': user.admin, 'permissions': { 'admin': false }, 'role_ids': [1] }],
+        'roles': [{ 'id': 1, 'name': 'user' }]
+      };
+    });
+
+    (0, _emberSimpleAuth.authenticateSession)(this.application, { user_id: user.id });
+
+    server.get('/users/me', function () {
+      return { user: user, permissions: { 'admin': false } };
+    });
+
+    visit('/bookings');
+
+    andThen(function () {
+      assert.equal(find('[data-test-booking-edit-btn]').length, 1, 'Owner should see edit button');
+    });
+
+    click('[data-test-booking-edit-btn]');
+
+    andThen(function () {
+      assert.equal(find('[data-test-booking-new-dialog]').length, 1, 'User should see edit dialog');
+      assert.equal(find('[data-test-booking-form-rental-name-input]').length, 1, 'User should see rental select');
+      assert.equal(find('[data-test-booking-dialog-from-date-div] input').length, 1, 'User should see \'from date\' input');
+      assert.equal(find('[data-test-booking-dialog-to-date-div] input').length, 1, 'User should \'to date\' input');
+
+      assert.equal(find('[data-test-booking-form-confirm-btn]').length, 1, 'User should see confirm button');
+    });
+  });
+});
+define('bs-client/tests/acceptance/login-test', ['qunit', 'bs-client/tests/helpers/module-for-acceptance'], function (_qunit, _moduleForAcceptance) {
+  'use strict';
+
+  /* global server */
+  (0, _moduleForAcceptance.default)('Acceptance | login', {
+    needs: ['model:me', 'model:permission']
+  });
+
+  (0, _qunit.test)('visiting /login', function (assert) {
+    server.post('/user_sessions.json', function (db, request) {
+      assert.equal(request.params.session.email, 'email_0@example.com', 'email does not match the expected one');
+      assert.equal(request.params.session.password, 'password_0', 'password does not match the expected one');
+
+      return db.user_sessions.create();
+    });
+
+    visit('/');
+
+    andThen(function () {
+      assert.equal(currentURL(), '/');
+    });
+
+    fillIn('[data-test-signin-email-field]', 'email_0@example.com');
+    fillIn('[data-test-signin-password-field]', 'password_0');
+    assert.equal(find('[data-test-signin-submit-btn]').length, 0, 'Login button should be shown');
+    assert.equal(find('[data-test-signout-link]').length, 0, 'Logout button should not be shown');
+
+    andThen(function () {
+      assert.equal(find('[data-test-signin-email-field]').val(), 'email_0@example.com');
+      assert.equal(find('[data-test-signin-password-field]').val(), 'password_0');
+    });
+
+    click('[data-test-signin-submit-btn]');
+  });
+});
+define('bs-client/tests/acceptance/rentals-list-test', ['qunit', 'bs-client/tests/helpers/module-for-acceptance', 'bs-client/tests/helpers/ember-simple-auth'], function (_qunit, _moduleForAcceptance, _emberSimpleAuth) {
+  'use strict';
+
+  //import $ from 'jquery';
+
+  (0, _moduleForAcceptance.default)('Acceptance | rentals list', {
+    needs: ['model:me', 'model:user', 'model:rental', 'model:booking', 'model:permission']
+  }); /* global server */
+
+
+  (0, _qunit.test)('requesting rentals to server', function (assert) {
+    server.get('/rentals', function (db, request) {
+      var params = request.queryParams;
+
+      assert.equal(params.excluded_attributes.length, 1, 'excluded_attributes do not match the expected ones');
+      assert.equal(params.excluded_attributes[0], 'busy_days', 'first excluded_attribute does not match the expected ones');
+      assert.equal(params.page, 0, 'page does not match the expected one');
+      assert.equal(params.sort_direction, 'asc', 'sort_direction does not match the expected one');
+      assert.equal(params.sort_field, 'name', 'sort_field does not match the expected one');
+
+      return db.rentals.all();
+    });
+
+    (0, _emberSimpleAuth.authenticateSession)(this.application, { user_id: 1 });
+    visit('/rentals');
+
+    andThen(function () {
+      assert.equal(currentURL(), '/rentals');
+    });
+  });
+
+  (0, _qunit.test)('listing rental as admin', function (assert) {
+    var adminUser = server.create('user', 'adminUser');
+    var normalUser = server.create('user', 'normalUser');
+
+    (0, _emberSimpleAuth.authenticateSession)(this.application, { user_id: 1 });
+
+    server.get('/rentals', function () {
+      return {
+        'rentals': [{ 'id': 1, 'name': 'Rental sample name', 'daily_rate': 5.50, 'user_id': normalUser.id }, { 'id': 2, 'name': 'Rental sample name 2', 'daily_rate': 10.10, 'user_id': adminUser.id }],
+        'users': [{ 'id': normalUser.id, 'email': normalUser.email, 'admin': normalUser.admin, 'permissions': { 'admin': false }, 'role_ids': [1] }, { 'id': adminUser.id, 'email': adminUser.email, 'admin': adminUser.admin, 'permissions': { 'admin': true }, 'role_ids': [2] }],
+        'roles': [{ 'id': 1, 'name': 'user' }, { 'id': 2, 'name': 'admin' }]
+      };
+    });
+
+    server.get('/users', function (db, request) {
+      var params = request.queryParams;
+
+      assert.equal(params.exclude_ids, adminUser.id, 'exclude_ids does not match the expected ones');
+      assert.equal(params.paginate, 'false', 'paginate does not match the expected ones: ');
+      assert.equal(params.selected_fields.length, 2, 'selected_fields does not match the expected one');
+      assert.equal(params.selected_fields[0], 'id', 'first selected field does not match the expected one');
+      assert.equal(params.selected_fields[1], 'email', 'second selected field does not match the expected one');
+
+      return db.users.all();
+    });
+
+    server.get('/users/me', function () {
+      return {
+        user: adminUser,
+        permissions: { 'admin': true }
+      };
+    });
+
+    visit('/rentals');
+
+    andThen(function () {
+      assert.equal(find('[data-test-rental-book-btn]').length, 0, 'Admin should not see booking button');
+      assert.equal(find('[data-test-rental-edit-btn]').length, 2, 'Admin should see edit button');
+      assert.equal(find('[data-test-rental-delete-btn]').length, 2, 'Admin should see delete button');
+      assert.ok(adminUser.isAdmin, 'user should be admin');
+      assert.equal(find('[data-test-rental-tr]').length, 2, 'Admin should see two rentals');
+      assert.equal(find('[data-test-rental-tr]:first td').length, 4, 'Admin should see 4 columns in table');
+    });
+  });
+
+  (0, _qunit.test)('listing rentals as owner', function (assert) {
+    var normalUser = server.create('user', 'normalUser');
+    var adminUser = server.create('user', 'adminUser');
+
+    server.get('/rentals', function () {
+      return {
+        'rentals': [{ 'id': 1, 'name': 'Rental sample name', 'daily_rate': 5.50, 'user_id': adminUser.id }, { 'id': 2, 'name': 'Rental sample name 2', 'daily_rate': 10.10, 'user_id': normalUser.id }],
+        'users': [{ 'id': normalUser.id, 'email': normalUser.email, 'admin': normalUser.admin, 'permissions': { 'admin': false }, 'role_ids': [1] }, { 'id': adminUser.id, 'email': adminUser.email, 'admin': adminUser.admin, 'permissions': { 'admin': true }, 'role_ids': [2] }],
+        'roles': [{ 'id': 1, 'name': 'user' }, { 'id': 2, 'name': 'admin' }]
+      };
+    });
+
+    (0, _emberSimpleAuth.authenticateSession)(this.application, { user_id: normalUser.id });
+
+    server.get('/users/me', function () {
+      return { user: normalUser, permissions: { 'admin': false } };
+    });
+
+    visit('/rentals');
+
+    andThen(function () {
+      assert.equal(find('[data-test-rental-book-btn]').length, 1, 'Owner should not see booking button');
+      assert.equal(find('[data-test-rental-edit-btn]').length, 1, 'Owner should see edit button');
+      assert.equal(find('[data-test-rental-delete-btn]').length, 1, 'Owner should see delete button');
+      assert.equal(find('[data-test-rental-tr]').length, 2, 'Owner should see two rentals');
+      assert.equal(find('tbody tr:first td').length, 3, 'Onwer should see 3 columns in table');
+    });
+  });
+
+  (0, _qunit.test)('listing rental as user', function (assert) {
+    var adminUser = server.create('user', 'adminUser');
+    var normalUser = server.create('user', 'normalUser');
+    var normalUser2 = server.create('user', 'normalUser');
+
+    server.get('/rentals', function () {
+      return {
+        'rentals': [{ 'id': 1, 'name': 'Rental sample name', 'daily_rate': 5.50, 'user_id': normalUser2.id }, { 'id': 2, 'name': 'Rental sample name 2', 'daily_rate': 10.10, 'user_id': adminUser.id }],
+        'users': [{ 'id': normalUser.id, 'email': normalUser.email, 'admin': normalUser.admin, 'permissions': { 'admin': false }, 'role_ids': [1] }, { 'id': normalUser2.id, 'email': normalUser2.email, 'admin': normalUser2.admin, 'permissions': { 'admin': false }, 'role_ids': [1] }, { 'id': adminUser.id, 'email': adminUser.email, 'admin': adminUser.admin, 'permissions': { 'admin': true }, 'role_ids': [2] }],
+        'roles': [{ 'id': 1, 'name': 'user' }, { 'id': 2, 'name': 'admin' }]
+      };
+    });
+
+    (0, _emberSimpleAuth.authenticateSession)(this.application, { user_id: normalUser.id });
+
+    server.get('/users/me', function () {
+      return { user: normalUser, permissions: { 'admin': false } };
+    });
+
+    visit('/rentals');
+
+    andThen(function () {
+      assert.notOk(normalUser.isAdmin, 'user should not be admin');
+      assert.equal(find('tbody tr:first td').length, 3, 'User should see 3 columns in table');
+
+      assert.equal(find('[data-test-rental-delete-btn]').length, 0, 'User should not see delete button');
+      assert.equal(find('[data-test-rental-tr]').length, 2, 'User should see two rentals');
+      assert.equal(find('[data-test-rental-edit-btn]').length, 0, 'User should not see edit button');
+
+      assert.equal(find('[data-test-rental-book-btn]').length, 2, 'User should see booking button');
+    });
+  });
+
+  (0, _qunit.test)('edit rental', function (assert) {
+    var user = server.create('user', 'normalUser');
+
+    server.get('/rentals', function () {
+      return {
+        'rentals': [{ 'id': 1, 'name': 'Rental sample name', 'daily_rate': 99.49, 'user_id': 1 }],
+        'users': [{ 'id': 1, 'email': user.email, 'admin': user.admin, 'permissions': { 'admin': false }, 'role_ids': [1] }],
+        'roles': [{ 'id': 1, 'name': 'user' }]
+      };
+    });
+
+    (0, _emberSimpleAuth.authenticateSession)(this.application, { user_id: user.id });
+
+    server.get('/users/me', function () {
+      return { user: user, permissions: { 'admin': false } };
+    });
+
+    visit('/rentals');
+
+    andThen(function () {
+      assert.equal(find('[data-test-rental-edit-btn]').length, 1, 'Owner should see edit button');
+      assert.equal(find('a.edit-btn').length, 1, 'Owner should see edit button');
+    });
+
+    click('[data-test-rental-edit-btn]');
+
+    andThen(function () {
+      assert.equal(find('[data-test-rental-new-dialog]').length, 1, 'User should see edit dialog');
+      assert.equal(find('[data-test-rental-new-dialog-name-input]').length, 1, 'User should see name input');
+      assert.equal(find('[data-test-rental-new-dialog-name-input]').val(), 'Rental sample name', 'Name should be loaded');
+    });
+  });
+});
 define('bs-client/tests/app.lint-test', [], function () {
   'use strict';
 
@@ -37,7 +425,7 @@ define('bs-client/tests/app.lint-test', [], function () {
 
   QUnit.test('authenticators/bs-token.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'authenticators/bs-token.js should pass ESLint\n\n8:12 - \'isEmpty\' is not defined. (no-undef)\n8:30 - \'isEmpty\' is not defined. (no-undef)');
+    assert.ok(true, 'authenticators/bs-token.js should pass ESLint\n\n');
   });
 
   QUnit.test('authenticators/devise.js', function (assert) {
@@ -97,7 +485,7 @@ define('bs-client/tests/app.lint-test', [], function () {
 
   QUnit.test('helpers/sort-icon.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'helpers/sort-icon.js should pass ESLint\n\n3:8 - Expected a function expression. (func-style)');
+    assert.ok(true, 'helpers/sort-icon.js should pass ESLint\n\n');
   });
 
   QUnit.test('initializers/accounting.js', function (assert) {
@@ -127,12 +515,12 @@ define('bs-client/tests/app.lint-test', [], function () {
 
   QUnit.test('instance-initializers/inject-store-in-components.js', function (assert) {
     assert.expect(1);
-    assert.ok(true, 'instance-initializers/inject-store-in-components.js should pass ESLint\n\n5:3 - Expected method shorthand. (object-shorthand)');
+    assert.ok(true, 'instance-initializers/inject-store-in-components.js should pass ESLint\n\n');
   });
 
   QUnit.test('instance-initializers/permissions.js', function (assert) {
     assert.expect(1);
-    assert.ok(true, 'instance-initializers/permissions.js should pass ESLint\n\n5:3 - Expected method shorthand. (object-shorthand)');
+    assert.ok(true, 'instance-initializers/permissions.js should pass ESLint\n\n');
   });
 
   QUnit.test('mixins/base-date-picker.js', function (assert) {
@@ -317,7 +705,7 @@ define('bs-client/tests/app.lint-test', [], function () {
 
   QUnit.test('serializers/application.js', function (assert) {
     assert.expect(1);
-    assert.ok(true, 'serializers/application.js should pass ESLint\n\n4:3 - Expected method shorthand. (object-shorthand)\n10:3 - Expected method shorthand. (object-shorthand)');
+    assert.ok(true, 'serializers/application.js should pass ESLint\n\n');
   });
 
   QUnit.test('serializers/booking.js', function (assert) {
@@ -337,7 +725,7 @@ define('bs-client/tests/app.lint-test', [], function () {
 
   QUnit.test('services/endpoints.js', function (assert) {
     assert.expect(1);
-    assert.ok(true, 'services/endpoints.js should pass ESLint\n\n9:3 - Expected method shorthand. (object-shorthand)');
+    assert.ok(true, 'services/endpoints.js should pass ESLint\n\n');
   });
 
   QUnit.test('services/modal-manager.js', function (assert) {
@@ -362,7 +750,7 @@ define('bs-client/tests/app.lint-test', [], function () {
 
   QUnit.test('transforms/object.js', function (assert) {
     assert.expect(1);
-    assert.ok(true, 'transforms/object.js should pass ESLint\n\n5:3 - Expected method shorthand. (object-shorthand)\n13:3 - Expected method shorthand. (object-shorthand)');
+    assert.ok(true, 'transforms/object.js should pass ESLint\n\n');
   });
 });
 define('bs-client/tests/helpers/destroy-app', ['exports'], function (exports) {
@@ -371,10 +759,12 @@ define('bs-client/tests/helpers/destroy-app', ['exports'], function (exports) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = destroyApp;
-  function destroyApp(application) {
+  exports.default = Ember.Helper.helper(function destroyApp(application) {
     Ember.run(application, 'destroy');
-  }
+    if (window.server) {
+      window.server.shutdown();
+    }
+  });
 });
 define('bs-client/tests/helpers/ember-basic-dropdown', ['exports', 'ember-basic-dropdown/test-support/helpers', 'ember-native-dom-helpers'], function (exports, _helpers, _emberNativeDomHelpers) {
   'use strict';
@@ -410,7 +800,7 @@ define('bs-client/tests/helpers/ember-basic-dropdown', ['exports', 'ember-basic-
   exports.default = _helpers.default;
   var nativeClick = exports.nativeClick = _emberNativeDomHelpers.click;
 });
-define('bs-client/tests/helpers/ember-cli-clipboard', ['exports', 'ember-test'], function (exports, _emberTest) {
+define('bs-client/tests/helpers/ember-cli-clipboard', ['exports'], function (exports) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -420,13 +810,13 @@ define('bs-client/tests/helpers/ember-cli-clipboard', ['exports', 'ember-test'],
   exports.triggerError = triggerError;
 
   exports.default = function () {
-    _emberTest.default.registerAsyncHelper('triggerCopySuccess', function (app) {
+    Test.registerAsyncHelper('triggerCopySuccess', function (app) {
       var selector = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '.copy-btn';
 
       fireComponentActionFromApp(app, selector, 'success');
     });
 
-    _emberTest.default.registerAsyncHelper('triggerCopyError', function (app) {
+    Test.registerAsyncHelper('triggerCopyError', function (app) {
       var selector = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '.copy-btn';
 
       fireComponentActionFromApp(app, selector, 'error');
@@ -434,6 +824,7 @@ define('bs-client/tests/helpers/ember-cli-clipboard', ['exports', 'ember-test'],
   };
 
   var run = Ember.run;
+  var Test = Ember.Test;
 
 
   /* === Integration Test Helpers === */
@@ -673,7 +1064,26 @@ define('bs-client/tests/helpers/ember-simple-auth', ['exports', 'ember-simple-au
 define('bs-client/tests/helpers/ember-sortable/test-helpers', ['ember-sortable/helpers/drag', 'ember-sortable/helpers/reorder'], function () {
   'use strict';
 });
-define('bs-client/tests/helpers/module-for-acceptance', ['exports', 'qunit', 'bs-client/tests/helpers/start-app', 'bs-client/tests/helpers/destroy-app'], function (exports, _qunit, _startApp, _destroyApp) {
+define('bs-client/tests/helpers/ember-test-selectors', ['exports', 'ember-test-selectors'], function (exports, _emberTestSelectors) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  var deprecate = Ember.deprecate;
+
+
+  var message = 'Importing testSelector() from "<appname>/tests/helpers/ember-test-selectors" is deprecated. ' + 'Please import testSelector() from "ember-test-selectors" instead.';
+
+  deprecate(message, false, {
+    id: 'ember-test-selectors.test-selector-import',
+    until: '0.2.0',
+    url: 'https://github.com/simplabs/ember-test-selectors#usage'
+  });
+
+  exports.default = _emberTestSelectors.default;
+});
+define('bs-client/tests/helpers/module-for-acceptance', ['exports', 'qunit', 'bs-client/tests/helpers/start-app'], function (exports, _qunit, _startApp) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -692,17 +1102,13 @@ define('bs-client/tests/helpers/module-for-acceptance', ['exports', 'qunit', 'bs
         }
       },
       afterEach: function afterEach() {
-        var _this = this;
-
-        var afterEach = options.afterEach && options.afterEach.apply(this, arguments);
-        return Promise.resolve(afterEach).then(function () {
-          return (0, _destroyApp.default)(_this.application);
-        });
+        Ember.run(this.application, 'destroy');
+        if (window.server) {
+          window.server.shutdown();
+        }
       }
     });
   };
-
-  var Promise = Ember.RSVP.Promise;
 });
 define('bs-client/tests/helpers/resolver', ['exports', 'bs-client/resolver', 'bs-client/config/environment'], function (exports, _resolver, _environment) {
   'use strict';
@@ -823,6 +1229,21 @@ define('bs-client/tests/tests.lint-test', [], function () {
 
   QUnit.module('ESLint | tests');
 
+  QUnit.test('acceptance/bookings-list-test.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'acceptance/bookings-list-test.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('acceptance/login-test.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'acceptance/login-test.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('acceptance/rentals-list-test.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'acceptance/rentals-list-test.js should pass ESLint\n\n');
+  });
+
   QUnit.test('helpers/destroy-app.js', function (assert) {
     assert.expect(1);
     assert.ok(true, 'helpers/destroy-app.js should pass ESLint\n\n');
@@ -830,7 +1251,7 @@ define('bs-client/tests/tests.lint-test', [], function () {
 
   QUnit.test('helpers/module-for-acceptance.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'helpers/module-for-acceptance.js should pass ESLint\n\n19:11 - \'afterEach\' is never reassigned. Use \'const\' instead. (prefer-const)');
+    assert.ok(true, 'helpers/module-for-acceptance.js should pass ESLint\n\n');
   });
 
   QUnit.test('helpers/resolver.js', function (assert) {
@@ -840,12 +1261,79 @@ define('bs-client/tests/tests.lint-test', [], function () {
 
   QUnit.test('helpers/start-app.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'helpers/start-app.js should pass ESLint\n\n10:9 - \'application\' is never reassigned. Use \'const\' instead. (prefer-const)');
+    assert.ok(true, 'helpers/start-app.js should pass ESLint\n\n');
   });
 
   QUnit.test('test-helper.js', function (assert) {
     assert.expect(1);
     assert.ok(true, 'test-helper.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('unit/models/booking-test.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'unit/models/booking-test.js should pass ESLint\n\n');
+  });
+});
+define('bs-client/tests/unit/models/booking-test', ['ember-qunit'], function (_emberQunit) {
+  'use strict';
+
+  var get = Ember.get;
+
+
+  (0, _emberQunit.moduleForModel)('booking', 'Unit | Model | booking', {
+    needs: ['service:validations', 'model:user', 'model:rental', 'ember-validations@validator:local/presence']
+  });
+
+  (0, _emberQunit.test)('\'hasStarted\' returns true if booking has started today or before', function (assert) {
+    var today = new Date();
+
+    var booking = this.subject({ startAt: today });
+    assert.equal(get(booking, 'hasStarted'), true);
+  });
+
+  (0, _emberQunit.test)('\'hasStarted\' returns false if booking is going to start tomorrow', function (assert) {
+    var tomorrow = moment(new Date()).add(1, 'days');
+
+    var booking = this.subject({ startAt: tomorrow });
+    assert.equal(get(booking, 'hasStarted'), false);
+  });
+
+  (0, _emberQunit.test)('\'hasEnded\' returns true if booking has ended today or before', function (assert) {
+    var today = new Date();
+
+    var booking = this.subject({ endAt: today });
+    assert.equal(get(booking, 'hasEnded'), true);
+  });
+
+  (0, _emberQunit.test)('\'hasEnded\' returns false if booking is going to end tomorrow', function (assert) {
+    var tomorrow = moment(new Date()).add(1, 'days');
+
+    var booking = this.subject({ endAt: tomorrow });
+    assert.equal(get(booking, 'hasEnded'), false);
+  });
+
+  (0, _emberQunit.test)('\'isNow\' returns false if booking has ended yesterday', function (assert) {
+    var day1 = moment(new Date()).add(-2, 'days');
+    var day2 = moment(new Date()).add(-1, 'days');
+
+    var booking = this.subject({ startAt: day1, endAt: day2 });
+    assert.equal(get(booking, 'isNow'), false);
+  });
+
+  (0, _emberQunit.test)('\'isNow\' returns false if booking is going to start tomorrow', function (assert) {
+    var day1 = moment(new Date()).add(1, 'days');
+    var day2 = moment(new Date()).add(2, 'days');
+
+    var booking = this.subject({ startAt: day1, endAt: day2 });
+    assert.equal(get(booking, 'isNow'), false);
+  });
+
+  (0, _emberQunit.test)('\'isNow\' returns true if booking has started but has not ended yet', function (assert) {
+    var day1 = moment(new Date()).add(-1, 'days');
+    var day2 = moment(new Date()).add(1, 'days');
+
+    var booking = this.subject({ startAt: day1, endAt: day2 });
+    assert.equal(get(booking, 'isNow'), true);
   });
 });
 require('bs-client/tests/test-helper');

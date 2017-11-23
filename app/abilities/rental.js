@@ -6,6 +6,11 @@ export default GenericAbility.extend({
     return this.get('currentUser');
   }),
 
+  canEdit: Ember.computed('model.user', 'currentUser.isAdmin', function() {
+    return this.get('currentUser.isAdmin') ||
+      this.get('model.user.id') === this.get('currentUser.user.id');
+  }),
+
   canBook: Ember.computed('model.user', 'currentUser.isAdmin', function() {
     return !this.get('currentUser.isAdmin') &&
       this.get('model.user.id') !== this.get('currentUser.user.id');

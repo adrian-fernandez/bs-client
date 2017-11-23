@@ -1,8 +1,11 @@
 {{#modal-dialog onClose=(action 'close')
                 translucentOverlay=true
-                targetAttachment="center"}}
+                targetAttachment="center"
+                wrapperClassNames=""
+                overlayClassNames=""
+                containerClassNames=""}}
 
-  <div class="container">
+  <div class="container" data-test-rental-new-dialog>
     <div class="row">
       <div class="col-md-8 col-md-offset-2">
         <form class="form-horizontal" role="form">
@@ -26,7 +29,7 @@
             <div class="form-group">
               <label class="col-sm-2 control-label">{{t 'rental.columns.name'}}</label>
               <div class="col-sm-10">
-                {{input value=rental.name}}
+                {{input data-test-rental-new-dialog-name-input value=rental.name}}
               </div>
             </div>
 

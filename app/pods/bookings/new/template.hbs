@@ -1,8 +1,11 @@
 {{#modal-dialog onClose=(action 'close')
                 translucentOverlay=true
-                targetAttachment="center"}}
+                targetAttachment="center"
+                wrapperClassNames=""
+                overlayClassNames=""
+                containerClassNames=""}}
 
-  <div class="container">
+  <div class="container" data-test-booking-new-dialog>
     <div class="row">
       <div class="col-md-8 col-md-offset-2">
         <form class="form-horizontal" role="form">
@@ -12,21 +15,21 @@
             <div class="form-group">
               <label class="col-sm-2 control-label">Rental</label>
               <div class="col-sm-10">
-                <input type="text" disabled=true value={{rental.name}}>
+                <input data-test-booking-form-rental-name-input type="text" disabled=true value={{rental.name}}>
               </div>
             </div>
 
-            <div class="form-group">
+            <div class="form-group" data-test-booking-dialog-from-date-div>
               <label class="col-sm-2 control-label">From date</label>
               <div class="col-sm-10">
-                {{date-picker value=booking.start_at datesDisabled=busyDays clearBtn=true}}
+                {{date-picker value=booking.startAt datesDisabled=busyDays clearBtn=true}}
               </div>
             </div>
 
-            <div class="form-group">
+            <div class="form-group" data-test-booking-dialog-to-date-div>
               <label class="col-sm-2 control-label">To Date</label>
               <div class="col-sm-10">
-                {{date-picker value=booking.end_at datesDisabled=busyDays afterDate=booking.start_at clearBtn=true}}
+                {{date-picker value=booking.endAt datesDisabled=busyDays afterDate=booking.startAt clearBtn=true}}
               </div>
             </div>
 
@@ -34,7 +37,7 @@
               <div class="form-group">
                 <label class="col-sm-2 control-label">Days</label>
                 <div class="col-sm-10">
-                  <input type="text" disabled=true value={{calculatedBookingDays}}>
+                  <input type="text" data-test-booking-form-days-input disabled=true value={{calculatedBookingDays}}>
                 </div>
               </div>
 
@@ -44,12 +47,14 @@
                   <input type="text" disabled=true value={{calculatedBookingPrice}}>
                 </div>
               </div>
+            {{else}}
+              <span class='test'>[{{booking.startAt}}][{{booking.endAt}}]</span>
             {{/if}}
 
             <div class="col-sm-offset-2 col-sm-10">
               <div class="pull-right">
                 <button type="button" class="btn btn-danger" {{action 'close'}}>{{t 'general.cancel'}}</button>
-                <button type="button" class="btn btn-success" disabled={{not canConfirmBooking}} {{action 'save'}}>{{t 'general.confirm'}}</button>
+                <button type="button" data-test-booking-form-confirm-btn class="btn btn-success" disabled={{not canConfirmBooking}} {{action 'save'}}>{{t 'general.confirm'}}</button>
               </div>
             </div>
           </fieldset>

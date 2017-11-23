@@ -11,7 +11,7 @@ module.exports = function(environment) {
     EmberENV: {
       environment,
       FEATURES: {
-          'link-to': true
+        'link-to': true
       },
       EXTEND_PROTOTYPES: {
         Date: false
@@ -27,8 +27,19 @@ module.exports = function(environment) {
       allowEmpty: true // default: false
     },
 
-    BACKEND_URL: process.env.BACKEND_URL
+    // BACKEND_URL: process.env.BACKEND_URL
+    BACKEND_URL: 'http://localhost:3000'
   };
+
+  if (environment === 'development' || environment === 'production') {
+    ENV['ember-cli-mirage'] = {
+      enabled: false
+    };
+  } else if (environment === 'test') {
+    ENV['ember-cli-mirage'] = {
+      discoverEmberDataModels: true
+    };
+  }
 
   if (environment === 'development') {
     ENV.APP.LOG_TRANSITIONS = true;
@@ -38,6 +49,9 @@ module.exports = function(environment) {
 
   if (environment === 'test') {
     ENV.locationType = 'none';
+    ENV['simple-auth'] = {
+      store: 'simple-auth-session-store:ephemeral'
+    };
 
     // keep test console output quieter
     ENV.APP.LOG_ACTIVE_GENERATION = false;

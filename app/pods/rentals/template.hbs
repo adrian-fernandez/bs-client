@@ -1,7 +1,7 @@
 {{#if (can 'create rental')}}
   <div class="row-fluid">
     <div class="pull-right action-buttons-div">
-      {{#link-to 'rentals.new' rental data-test-rental-new-btn class='btn btn-info'}}{{t 'rental.actions.new_rental'}}{{/link-to}}
+      {{#link-to 'rentals.new' data-test-rental-new-btn class='btn btn-info'}}{{t 'rental.actions.new_rental'}}{{/link-to}}
     </div>
   </div>
 {{/if}}
@@ -67,7 +67,7 @@
 
         <td>
           {{#if (can 'book rental' rental)}}
-            <a href='#' {{action 'book' rental}} data-test-rental-book-btn title={{t 'rental.tips.book'}}>{{fa-icon 'shopping-cart'}}</a>
+            {{#link-to "rentals.book" rental data-test-rental-book-btn}}{{fa-icon 'shopping-cart'}}{{/link-to}}
           {{/if}}
 
           {{#if (can 'edit rental' rental)}}

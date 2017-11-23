@@ -18,10 +18,10 @@ Router.map(function() {
     this.route('new');
     this.route('edit', { path: '/:rental_id/edit' });
     this.route('bookings', { path: '/:rental_id/bookings' });
+    this.route('book', { path: '/:rental_id/book'});
   });
 
   this.route('bookings', function() {
-    this.route('new');
     this.route('edit', { path: '/:booking_id/edit' });
   });
 });

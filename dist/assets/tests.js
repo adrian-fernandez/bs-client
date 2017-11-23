@@ -227,27 +227,6 @@ define('bs-client/tests/acceptance/rentals-list-test', ['qunit', 'bs-client/test
   }); /* global server */
 
 
-  (0, _qunit.test)('requesting rentals to server', function (assert) {
-    server.get('/rentals', function (db, request) {
-      var params = request.queryParams;
-
-      assert.equal(params.excluded_attributes.length, 1, 'excluded_attributes do not match the expected ones');
-      assert.equal(params.excluded_attributes[0], 'busy_days', 'first excluded_attribute does not match the expected ones');
-      assert.equal(params.page, 0, 'page does not match the expected one');
-      assert.equal(params.sort_direction, 'asc', 'sort_direction does not match the expected one');
-      assert.equal(params.sort_field, 'name', 'sort_field does not match the expected one');
-
-      return db.rentals.all();
-    });
-
-    (0, _emberSimpleAuth.authenticateSession)(this.application, { user_id: 1 });
-    visit('/rentals');
-
-    andThen(function () {
-      assert.equal(currentURL(), '/rentals');
-    });
-  });
-
   (0, _qunit.test)('listing rental as admin', function (assert) {
     var adminUser = server.create('user', 'adminUser');
     var normalUser = server.create('user', 'normalUser');
@@ -636,6 +615,16 @@ define('bs-client/tests/app.lint-test', [], function () {
   QUnit.test('pods/landing/route.js', function (assert) {
     assert.expect(1);
     assert.ok(true, 'pods/landing/route.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('pods/rentals/book/controller.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'pods/rentals/book/controller.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('pods/rentals/book/route.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'pods/rentals/book/route.js should pass ESLint\n\n');
   });
 
   QUnit.test('pods/rentals/controller.js', function (assert) {

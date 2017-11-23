@@ -42,8 +42,8 @@ export default Ember.Route.extend({
         q: params.q,
         user_filter: params.userFilter,
         price_from_filter: params.priceFromFilter,
-        price_to_filter: params.priceToFilter,
-        excluded_attributes: ['busy_days']
+        price_to_filter: params.priceToFilter//,
+        // excluded_attributes: ['busy_days']
       }),
       rentalDailyRateRanges: this.rentalStatistics(),
       notFilteringPrice: (!params.priceFromFilter && !params.priceToFilter),

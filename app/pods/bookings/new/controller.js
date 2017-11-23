@@ -45,7 +45,6 @@ export default Ember.Controller.extend(ErrorGenerator, {
           autoClear: true
         });
 
-        this.get('modal').reload();
         this.send('closeModal');
       };
 

@@ -10,7 +10,7 @@
       <div class="col-md-8 col-md-offset-2">
         <form class="form-horizontal" role="form">
           <fieldset>
-            <legend>{{t 'rental.actions.new_rental'}}</legend>
+            <legend>{{t 'rental.title'}}</legend>
 
             {{#if (can 'change user rental')}}
               <div class="form-group">
@@ -43,7 +43,7 @@
             <div class="col-sm-offset-2 col-sm-10">
               <div class="pull-right">
                 <button type="button" class="btn btn-danger" {{action 'close'}}>{{t 'general.cancel'}}</button>
-                <button type="button" class="btn btn-success" disabled={{not (can 'save rental')}} {{action 'save'}}>{{t 'general.confirm'}}</button>
+                <button type="button" class="btn btn-success" {{action 'save'}}>{{t 'general.confirm'}}</button>
               </div>
             </div>
           </fieldset>

@@ -14,27 +14,6 @@ moduleForAcceptance('Acceptance | rentals list', {
   ]
 });
 
-test('requesting rentals to server', function(assert) {
-  server.get('/rentals', function(db, request) {
-    var params = request.queryParams;
-
-    assert.equal(params.excluded_attributes.length, 1, 'excluded_attributes do not match the expected ones');
-    assert.equal(params.excluded_attributes[0], 'busy_days', 'first excluded_attribute does not match the expected ones');
-    assert.equal(params.page, 0, 'page does not match the expected one');
-    assert.equal(params.sort_direction, 'asc', 'sort_direction does not match the expected one');
-    assert.equal(params.sort_field, 'name', 'sort_field does not match the expected one');
-
-    return db.rentals.all();
-  });
-
-  authenticateSession(this.application, { user_id: 1 });
-  visit('/rentals');
-
-  andThen(function() {
-    assert.equal(currentURL(), '/rentals');
-  });
-});
-
 test('listing rental as admin', function(assert) {
   const adminUser = server.create('user', 'adminUser');
   const normalUser = server.create('user', 'normalUser');

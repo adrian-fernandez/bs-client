@@ -16,7 +16,7 @@ sign_up:
   password: password
   confirm_password: Confirm Password
   cta: Create my account
-  created: Your account was successfully created
+  created: Your account was successfully saved
   already_have_account: Already have an account?
 navigation:
   rentals: Rentals
@@ -26,7 +26,7 @@ rental:
   actions:
     new_rental: New rental
   messages:
-    created: Your rental was successfully created
+    created: Your rental was successfully saved
   columns:
     name: Name
     user: User
@@ -49,7 +49,7 @@ booking:
     days: Days
     price: Price (€)
   messages:
-    created: Your booking was successfully created
+    created: Your booking was successfully saved
     destroyed: 'Booking was successfully deleted'
   tips:
     edit: Edit booking

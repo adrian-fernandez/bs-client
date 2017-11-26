@@ -11,11 +11,15 @@ moduleForAcceptance('Acceptance | login', {
 
 test('visiting /login', function(assert) {
   server.post('/user_sessions.json', function(db, request) {
-    assert.equal(request.params.session.email, 'email_0@example.com', 'email does not match the expected one');
-    assert.equal(request.params.session.password, 'password_0', 'password does not match the expected one');
+    if (request.params.session) {
+      assert.equal(request.params.session.email, 'email_0@example.com', 'email does not match the expected one');
+      assert.equal(request.params.session.password, 'password_0', 'password does not match the expected one');
+    }
 
-    return db.user_sessions.create();
+    return {'user': {'id': 2, 'email': 'admin@adrian-bs.com', 'admin': true, 'role_ids': [2]}, 'session': { 'id': 7, 'access_token': '2123a309fe681eab365b419aa7aa3b94', 'accessed_at': '2017-11-26', 'revoked_at': null, 'created_at': '2017-11-26T10:46:43.514Z'}};
   });
+
+  server.get('/users/me', () => { return {  }; });
 
   visit('/');
 

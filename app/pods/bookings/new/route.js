@@ -9,7 +9,7 @@ export default Ember.Route.extend(BookingActions, {
       data.user = this.get('currentUser.user');
     }
 
-    const rental = this.store.peekRecord('rental', params.rental_id);
+    const rental = this.store.findRecord('rental', params.rental_id);
     data.rental = rental;
 
     const hash = {

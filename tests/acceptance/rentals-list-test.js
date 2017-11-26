@@ -27,8 +27,8 @@ test('listing rental as admin', function(assert) {
         { 'id': 2, 'name': 'Rental sample name 2', 'daily_rate': 10.10, 'user_id': adminUser.id }
       ],
       'users': [
-        { 'id': normalUser.id, 'email': normalUser.email, 'admin': normalUser.admin, 'permissions': { 'admin': false }, 'role_ids': [1] },
-        { 'id': adminUser.id, 'email': adminUser.email, 'admin': adminUser.admin, 'permissions': { 'admin': true }, 'role_ids': [2] }
+        { 'id': normalUser.id, 'email': normalUser.email, 'admin': normalUser.admin, 'role_ids': [1] },
+        { 'id': adminUser.id, 'email': adminUser.email, 'admin': adminUser.admin, 'role_ids': [2] }
       ],
       'roles': [{ 'id': 1, 'name': 'user' }, { 'id': 2, 'name': 'admin' }]
     };
@@ -47,10 +47,7 @@ test('listing rental as admin', function(assert) {
   });
 
   server.get('/users/me', () => {
-    return {
-      user: adminUser,
-      permissions: { 'admin': true }
-    };
+    return { user: adminUser };
   });
 
   visit('/rentals');
@@ -76,8 +73,8 @@ test('listing rentals as owner', function(assert) {
         { 'id': 2, 'name': 'Rental sample name 2', 'daily_rate': 10.10, 'user_id': normalUser.id }
       ],
       'users': [
-        { 'id': normalUser.id, 'email': normalUser.email, 'admin': normalUser.admin, 'permissions': { 'admin': false }, 'role_ids': [1] },
-        { 'id': adminUser.id, 'email': adminUser.email, 'admin': adminUser.admin, 'permissions': { 'admin': true }, 'role_ids': [2] }
+        { 'id': normalUser.id, 'email': normalUser.email, 'admin': normalUser.admin, 'role_ids': [1] },
+        { 'id': adminUser.id, 'email': adminUser.email, 'admin': adminUser.admin, 'role_ids': [2] }
       ],
       'roles': [{ 'id': 1, 'name': 'user' }, { 'id': 2, 'name': 'admin' }]
     };
@@ -85,7 +82,7 @@ test('listing rentals as owner', function(assert) {
 
   authenticateSession(this.application, { user_id: normalUser.id });
 
-  server.get('/users/me', () => { return { user: normalUser, permissions: { 'admin': false } }; });
+  server.get('/users/me', () => { return { user: normalUser }; });
 
   visit('/rentals');
 
@@ -110,9 +107,9 @@ test('listing rental as user', function(assert) {
         { 'id': 2, 'name': 'Rental sample name 2', 'daily_rate': 10.10, 'user_id': adminUser.id }
       ],
       'users': [
-        { 'id': normalUser.id, 'email': normalUser.email, 'admin': normalUser.admin, 'permissions': { 'admin': false }, 'role_ids': [1] },
-        { 'id': normalUser2.id, 'email': normalUser2.email, 'admin': normalUser2.admin, 'permissions': { 'admin': false }, 'role_ids': [1] },
-        { 'id': adminUser.id, 'email': adminUser.email, 'admin': adminUser.admin, 'permissions': { 'admin': true }, 'role_ids': [2] }
+        { 'id': normalUser.id, 'email': normalUser.email, 'admin': normalUser.admin, 'role_ids': [1] },
+        { 'id': normalUser2.id, 'email': normalUser2.email, 'admin': normalUser2.admin, 'role_ids': [1] },
+        { 'id': adminUser.id, 'email': adminUser.email, 'admin': adminUser.admin, 'role_ids': [2] }
       ],
       'roles': [{ 'id': 1, 'name': 'user' }, { 'id': 2, 'name': 'admin' }]
     };
@@ -120,7 +117,7 @@ test('listing rental as user', function(assert) {
 
   authenticateSession(this.application, { user_id: normalUser.id });
 
-  server.get('/users/me', () => { return { user: normalUser, permissions: { 'admin': false } }; });
+  server.get('/users/me', () => { return { user: normalUser }; });
 
   visit('/rentals');
 
@@ -141,15 +138,15 @@ test('edit rental', function(assert) {
 
   server.get('/rentals', () => {
     return {
-      'rentals': [{ 'id': 1, 'name': 'Rental sample name', 'daily_rate': 99.49, 'user_id': 1 }],
-      'users': [{ 'id': 1, 'email': user.email, 'admin': user.admin, 'permissions': { 'admin': false }, 'role_ids': [1] }],
+      'rentals': [{ 'id': 1, 'name': 'Rental sample name', 'daily_rate': 99.49, 'user_id': user.id }],
+      'users': [{ 'id': user.id, 'email': user.email, 'admin': user.admin, 'role_ids': [1] }],
       'roles': [{ 'id': 1, 'name': 'user' }]
     };
   });
 
   authenticateSession(this.application, { user_id: user.id });
 
-  server.get('/users/me', () => { return { user, permissions: { 'admin': false } }; });
+  server.get('/users/me', () => { return { user }; });
 
   visit('/rentals');
 
@@ -164,5 +161,41 @@ test('edit rental', function(assert) {
     assert.equal(find('[data-test-rental-new-dialog]').length, 1, 'User should see edit dialog');
     assert.equal(find('[data-test-rental-new-dialog-name-input]').length, 1, 'User should see name input');
     assert.equal(find('[data-test-rental-new-dialog-name-input]').val(), 'Rental sample name', 'Name should be loaded');
+  });
+});
+
+test('book a rental', function(assert) {
+  const user = server.create('user', 'normalUser');
+  const user2 = server.create('user', 'normalUser');
+  const tomorrow = moment(new Date()).add(1, 'days');
+  const after3Days = tomorrow.add(2, 'days');
+
+  server.get('/rentals', () => {
+    return {
+      'rentals': [{ 'id': 1, 'name': 'Rental sample name', 'daily_rate': 99.49, 'user_id': user2.id, 'busy_days': [tomorrow.format('YYYY-MM-DD'), after3Days.format('YYYY-MM-DD')] }],
+      'users': [{ 'id': user2.id, 'email': user2.email, 'admin': user2.admin, 'role_ids': [1] }],
+      'roles': [{ 'id': 1, 'name': 'user' }]
+    };
+  });
+
+  authenticateSession(this.application, { user_id: user.id });
+
+  server.get('/users/me', () => { return { user }; });
+
+  visit('/rentals');
+
+  andThen(function() {
+    assert.equal(find('[data-test-rental-book-btn]').length, 1, 'User should see book button');
+  });
+
+  click('[data-test-rental-book-btn]');
+
+  andThen(function() {
+    assert.equal(currentURL(), '/rentals/' + 1 + '/book');
+    assert.equal(find('[data-test-booking-new-dialog]').length, 1, 'User should see booking dialog');
+    assert.equal(find('[data-test-booking-form-rental-name-input]').length, 1, 'User should see rental input');
+    assert.equal(find('[data-test-booking-dialog-from-date-div] input').length, 1, 'User should see \'from date\' input');
+    assert.equal(find('[data-test-booking-dialog-to-date-div] input').length, 1, 'User should see \'to date\' input');
+    // assert.equal(find('[data-test-booking-form-rental-name-input]').val(), 'Rental sample name', 'Rental name should be preloaded');
   });
 });

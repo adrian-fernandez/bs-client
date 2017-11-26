@@ -26,6 +26,8 @@ test('requesting bookings to server', function(assert) {
     return db.bookings.all();
   });
 
+  server.get('/users/me', () => { return { }; });
+
   authenticateSession(this.application, { user_id: 1 });
   visit('/bookings');
 
@@ -47,19 +49,19 @@ test('listing started bookings as admin', function(assert) {
     return {
       'rentals': [{ 'id': 1, 'name': 'Abshire LLC', 'daily_rate': 99.49, 'user_id': adminUser.id }],
       'bookings': [{ 'id': 1, 'rental_id': 1, 'start_at': yesterday.format('YYYY/MM/DD'), 'end_at': tomorrow.format('YYYY/MM/DD'), 'days': 1, 'price': 99.49, 'user_id': adminUser.id }],
-      'users': [{ 'id': adminUser.id, 'email': adminUser.email, 'admin': adminUser.admin, 'permissions': { 'admin': true }, 'role_ids': [1] }],
+      'users': [{ 'id': adminUser.id, 'email': adminUser.email, 'admin': adminUser.admin, 'role_ids': [1] }],
       'roles': [{ 'id': 1, 'name': 'admin' }]
     };
   });
 
   server.get('/users', () => {
     return {
-      'users': [{ 'id': adminUser.id, 'email': adminUser.email, 'admin': adminUser.admin, 'permissions': { 'admin': true }, 'role_ids': [1] }],
+      'users': [{ 'id': adminUser.id, 'email': adminUser.email, 'admin': adminUser.admin,  'role_ids': [1] }],
       'roles': [{ 'id': 1, 'name': 'admin' }]
     };
   });
 
-  server.get('/users/me', () => { return { user: adminUser, permissions: { 'admin': true } }; });
+  server.get('/users/me', () => { return { user: adminUser }; });
 
   visit('/bookings');
 
@@ -85,19 +87,19 @@ test('listing bookings as admin', function(assert) {
     return {
       'rentals': [{ 'id': 1, 'name': 'Abshire LLC', 'daily_rate': 99.49, 'user_id': adminUser.id }],
       'bookings': [{ 'id': 1, 'rental_id': 1, 'start_at': tomorrow.format('YYYY/MM/DD'), 'end_at': nextWeek.format('YYYY/MM/DD'), 'days': 7, 'price': 696.43, 'user_id': adminUser.id }],
-      'users': [{ 'id': adminUser.id, 'email': adminUser.email, 'admin': adminUser.admin, 'permissions': { 'admin': true }, 'role_ids': [1] }],
+      'users': [{ 'id': adminUser.id, 'email': adminUser.email, 'admin': adminUser.admin,  'role_ids': [1] }],
       'roles': [{ 'id': 1, 'name': 'admin' }]
     };
   });
 
   server.get('/users', () => {
     return {
-      'users': [{ 'id': adminUser.id, 'email': adminUser.email, 'admin': adminUser.admin, 'permissions': { 'admin': true }, 'role_ids': [1] }],
+      'users': [{ 'id': adminUser.id, 'email': adminUser.email, 'admin': adminUser.admin,  'role_ids': [1] }],
       'roles': [{ 'id': 1, 'name': 'admin' }]
     };
   });
 
-  server.get('/users/me', () => { return { user: adminUser, permissions: { 'admin': true } }; });
+  server.get('/users/me', () => { return { user: adminUser }; });
 
   visit('/bookings');
 
@@ -121,14 +123,14 @@ test('listing bookings as owner', function(assert) {
     return {
       'bookings': [{ 'id': 1, 'start_at': tomorrow.format('YYYY/MM/DD'), 'end_at': nextWeek.format('YYYY/MM/DD'), 'days': 2, 'price': 20, 'user_id': user.id, 'rental_id': 1 }],
       'rentals': [{ 'id': 1, 'name': 'Abshire LLC', 'daily_rate': 10, 'user_id': 1 }],
-      'users': [{ 'id': user.id, 'email': user.email, 'admin': user.admin, 'permissions': { 'admin': false }, 'role_ids': [1] }],
+      'users': [{ 'id': user.id, 'email': user.email, 'admin': user.admin, 'role_ids': [1] }],
       'roles': [{ 'id': 1, 'name': 'user' }]
     };
   });
 
   authenticateSession(this.application, { user_id: user.id });
 
-  server.get('/users/me', () => { return { user, permissions: { 'admin': false } }; });
+  server.get('/users/me', () => { return { user }; });
 
   visit('/bookings');
 
@@ -142,23 +144,23 @@ test('listing bookings as owner', function(assert) {
 
 test('edit booking', function(assert) {
   const user = server.create('user', 'normalUser');
-  const today = new moment(new Date());
+  const today = new moment();
   const tomorrow = today.add(1, 'days');
   const nextWeek = today.add(7, 'days');
   const busyDay1 = today.add(10, 'days');
 
   server.get('/bookings', () => {
     return {
-      'bookings': [{ 'id': 1, 'start_at': tomorrow.format('YYYY/MM/DD'), 'end_at': nextWeek.format('YYYY/MM/DD'), 'days': 2, 'price': 20, 'user_id': user.id, 'rental_id': 1 }],
-      'rentals': [{ 'id': 1, 'name': 'Abshire LLC', 'daily_rate': 10, 'user_id': 1, 'busy_days': [busyDay1.format('YYYY/MM/DD')] }],
-      'users': [{ 'id': user.id, 'email': user.email, 'admin': user.admin, 'permissions': { 'admin': false }, 'role_ids': [1] }],
+      'bookings': [{ 'id': 1, 'start_at': tomorrow, 'end_at': nextWeek, 'days': 2, 'price': 20, 'user_id': user.id, 'rental_id': 1 }],
+      'rentals': [{ 'id': 1, 'name': 'Abshire LLC', 'daily_rate': 10, 'user_id': 1, 'busy_days': [busyDay1] }],
+      'users': [{ 'id': user.id, 'email': user.email, 'admin': user.admin, 'role_ids': [1] }],
       'roles': [{ 'id': 1, 'name': 'user' }]
     };
   });
 
   authenticateSession(this.application, { user_id: user.id });
 
-  server.get('/users/me', () => { return { user, permissions: { 'admin': false } }; });
+  server.get('/users/me', () => { return { user }; });
 
   visit('/bookings');
 

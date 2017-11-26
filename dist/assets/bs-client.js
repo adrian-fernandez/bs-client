@@ -4540,7 +4540,13 @@ define('bs-client/mixins/booking-actions', ['exports'], function (exports) {
   exports.default = Ember.Mixin.create({
     actions: {
       closeModal: function closeModal() {
-        this.transitionTo('bookings');
+        var from = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'bookings';
+
+        if (from === 'bookings') {
+          this.transitionTo('bookings');
+        } else {
+          this.transitionTo('rentals');
+        }
       }
     }
   });
@@ -4637,11 +4643,13 @@ define('bs-client/mixins/current-user', ['exports'], function (exports) {
           }
         });
       }, function (response) {
-        _this.notifications.addNotification({
-          message: response.responseJSON.errors.session[0],
-          type: 'error',
-          autoClear: true
-        });
+        if (response.responseJSON && response.responseJSON.errors && response.responseJSON.errors.session) {
+          _this.notifications.addNotification({
+            message: response.responseJSON.errors.session,
+            type: 'error',
+            autoClear: true
+          });
+        }
       });
     },
     signOut: function signOut() {
@@ -5091,8 +5099,6 @@ define('bs-client/pods/bookings/new/controller', ['exports', 'ember-data', 'bs-c
     value: true
   });
   exports.default = Ember.Controller.extend(_errorGenerator.default, {
-    pepe: 'ola',
-
     allUsersExceptMe: Ember.computed(function () {
       return this.get('store').query('user', {
         exclude_ids: this.get('currentUser.user.id')
@@ -5100,9 +5106,13 @@ define('bs-client/pods/bookings/new/controller', ['exports', 'ember-data', 'bs-c
     }),
 
     busyDays: Ember.computed('rental.busyDays.@each', function () {
-      return this.get('rental.busyDays').toArray().map(function (x) {
-        return moment(x).format('D MMM. YYYY');
-      });
+      if (this.get('rental.busyDays')) {
+        return this.get('rental.busyDays').toArray().map(function (x) {
+          return moment(x).format('D MMM. YYYY');
+        });
+      } else {
+        return [];
+      }
     }),
 
     canShowTo: Ember.computed.oneWay('booking.startAt'),
@@ -5158,7 +5168,7 @@ define('bs-client/pods/bookings/new/controller', ['exports', 'ember-data', 'bs-c
         });
       },
       close: function close() {
-        this.send('closeModal');
+        this.send('closeModal', this.get('from'));
       }
     }
   });
@@ -5177,7 +5187,7 @@ define('bs-client/pods/bookings/new/route', ['exports', 'bs-client/mixins/bookin
         data.user = this.get('currentUser.user');
       }
 
-      var rental = this.store.peekRecord('rental', params.rental_id);
+      var rental = this.store.findRecord('rental', params.rental_id);
       data.rental = rental;
 
       var hash = {
@@ -5318,7 +5328,9 @@ define('bs-client/pods/rentals/book/controller', ['exports', 'bs-client/pods/boo
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = _controller.default.extend();
+  exports.default = _controller.default.extend({
+    from: 'rentals'
+  });
 });
 define('bs-client/pods/rentals/book/route', ['exports', 'bs-client/pods/bookings/new/route'], function (exports, _route) {
   'use strict';
@@ -6792,6 +6804,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("bs-client/app")["default"].create({"LOG_TRANSITIONS":true,"LOG_TRANSITIONS_INTERNAL":true,"name":"bs-client","version":"0.0.0+e754ba73"});
+  require("bs-client/app")["default"].create({"LOG_TRANSITIONS":true,"LOG_TRANSITIONS_INTERNAL":true,"name":"bs-client","version":"0.0.0+3e11a227"});
 }
 //# sourceMappingURL=bs-client.map

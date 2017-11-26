@@ -3,8 +3,6 @@ import DS from 'ember-data';
 import ErrorGenerator from 'bs-client/mixins/error-generator';
 
 export default Ember.Controller.extend(ErrorGenerator, {
-  pepe: 'ola',
-
   allUsersExceptMe: Ember.computed(function() {
     return this.get('store').query('user',
       {
@@ -14,7 +12,11 @@ export default Ember.Controller.extend(ErrorGenerator, {
   }),
 
   busyDays: Ember.computed('rental.busyDays.@each', function() {
-    return this.get('rental.busyDays').toArray().map((x) => moment(x).format('D MMM. YYYY'));
+    if (this.get('rental.busyDays')) {
+      return this.get('rental.busyDays').toArray().map((x) => moment(x).format('D MMM. YYYY'));
+    } else {
+      return [];
+    }
   }),
 
   canShowTo: Ember.computed.oneWay('booking.startAt'),
@@ -69,7 +71,7 @@ export default Ember.Controller.extend(ErrorGenerator, {
     },
 
     close() {
-      this.send('closeModal');
+      this.send('closeModal', this.get('from'));
     }
   }
 });

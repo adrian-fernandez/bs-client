@@ -55,11 +55,13 @@ export default Ember.Mixin.create({
         }
       });
     }, (response) => {
-      this.notifications.addNotification({
-        message: response.responseJSON.errors.session[0],
-        type: 'error',
-        autoClear: true
-      });
+      if (response.responseJSON && response.responseJSON.errors && response.responseJSON.errors.session) {
+        this.notifications.addNotification({
+          message: response.responseJSON.errors.session,
+          type: 'error',
+          autoClear: true
+        });
+      }
     });
   },
 

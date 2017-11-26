@@ -22,6 +22,10 @@ define('bs-client/tests/acceptance/bookings-list-test', ['qunit', 'bs-client/tes
       return db.bookings.all();
     });
 
+    server.get('/users/me', function () {
+      return {};
+    });
+
     (0, _emberSimpleAuth.authenticateSession)(this.application, { user_id: 1 });
     visit('/bookings');
 
@@ -43,20 +47,20 @@ define('bs-client/tests/acceptance/bookings-list-test', ['qunit', 'bs-client/tes
       return {
         'rentals': [{ 'id': 1, 'name': 'Abshire LLC', 'daily_rate': 99.49, 'user_id': adminUser.id }],
         'bookings': [{ 'id': 1, 'rental_id': 1, 'start_at': yesterday.format('YYYY/MM/DD'), 'end_at': tomorrow.format('YYYY/MM/DD'), 'days': 1, 'price': 99.49, 'user_id': adminUser.id }],
-        'users': [{ 'id': adminUser.id, 'email': adminUser.email, 'admin': adminUser.admin, 'permissions': { 'admin': true }, 'role_ids': [1] }],
+        'users': [{ 'id': adminUser.id, 'email': adminUser.email, 'admin': adminUser.admin, 'role_ids': [1] }],
         'roles': [{ 'id': 1, 'name': 'admin' }]
       };
     });
 
     server.get('/users', function () {
       return {
-        'users': [{ 'id': adminUser.id, 'email': adminUser.email, 'admin': adminUser.admin, 'permissions': { 'admin': true }, 'role_ids': [1] }],
+        'users': [{ 'id': adminUser.id, 'email': adminUser.email, 'admin': adminUser.admin, 'role_ids': [1] }],
         'roles': [{ 'id': 1, 'name': 'admin' }]
       };
     });
 
     server.get('/users/me', function () {
-      return { user: adminUser, permissions: { 'admin': true } };
+      return { user: adminUser };
     });
 
     visit('/bookings');
@@ -83,20 +87,20 @@ define('bs-client/tests/acceptance/bookings-list-test', ['qunit', 'bs-client/tes
       return {
         'rentals': [{ 'id': 1, 'name': 'Abshire LLC', 'daily_rate': 99.49, 'user_id': adminUser.id }],
         'bookings': [{ 'id': 1, 'rental_id': 1, 'start_at': tomorrow.format('YYYY/MM/DD'), 'end_at': nextWeek.format('YYYY/MM/DD'), 'days': 7, 'price': 696.43, 'user_id': adminUser.id }],
-        'users': [{ 'id': adminUser.id, 'email': adminUser.email, 'admin': adminUser.admin, 'permissions': { 'admin': true }, 'role_ids': [1] }],
+        'users': [{ 'id': adminUser.id, 'email': adminUser.email, 'admin': adminUser.admin, 'role_ids': [1] }],
         'roles': [{ 'id': 1, 'name': 'admin' }]
       };
     });
 
     server.get('/users', function () {
       return {
-        'users': [{ 'id': adminUser.id, 'email': adminUser.email, 'admin': adminUser.admin, 'permissions': { 'admin': true }, 'role_ids': [1] }],
+        'users': [{ 'id': adminUser.id, 'email': adminUser.email, 'admin': adminUser.admin, 'role_ids': [1] }],
         'roles': [{ 'id': 1, 'name': 'admin' }]
       };
     });
 
     server.get('/users/me', function () {
-      return { user: adminUser, permissions: { 'admin': true } };
+      return { user: adminUser };
     });
 
     visit('/bookings');
@@ -121,7 +125,7 @@ define('bs-client/tests/acceptance/bookings-list-test', ['qunit', 'bs-client/tes
       return {
         'bookings': [{ 'id': 1, 'start_at': tomorrow.format('YYYY/MM/DD'), 'end_at': nextWeek.format('YYYY/MM/DD'), 'days': 2, 'price': 20, 'user_id': user.id, 'rental_id': 1 }],
         'rentals': [{ 'id': 1, 'name': 'Abshire LLC', 'daily_rate': 10, 'user_id': 1 }],
-        'users': [{ 'id': user.id, 'email': user.email, 'admin': user.admin, 'permissions': { 'admin': false }, 'role_ids': [1] }],
+        'users': [{ 'id': user.id, 'email': user.email, 'admin': user.admin, 'role_ids': [1] }],
         'roles': [{ 'id': 1, 'name': 'user' }]
       };
     });
@@ -129,7 +133,7 @@ define('bs-client/tests/acceptance/bookings-list-test', ['qunit', 'bs-client/tes
     (0, _emberSimpleAuth.authenticateSession)(this.application, { user_id: user.id });
 
     server.get('/users/me', function () {
-      return { user: user, permissions: { 'admin': false } };
+      return { user: user };
     });
 
     visit('/bookings');
@@ -144,16 +148,16 @@ define('bs-client/tests/acceptance/bookings-list-test', ['qunit', 'bs-client/tes
 
   (0, _qunit.test)('edit booking', function (assert) {
     var user = server.create('user', 'normalUser');
-    var today = new moment(new Date());
+    var today = new moment();
     var tomorrow = today.add(1, 'days');
     var nextWeek = today.add(7, 'days');
     var busyDay1 = today.add(10, 'days');
 
     server.get('/bookings', function () {
       return {
-        'bookings': [{ 'id': 1, 'start_at': tomorrow.format('YYYY/MM/DD'), 'end_at': nextWeek.format('YYYY/MM/DD'), 'days': 2, 'price': 20, 'user_id': user.id, 'rental_id': 1 }],
-        'rentals': [{ 'id': 1, 'name': 'Abshire LLC', 'daily_rate': 10, 'user_id': 1, 'busy_days': [busyDay1.format('YYYY/MM/DD')] }],
-        'users': [{ 'id': user.id, 'email': user.email, 'admin': user.admin, 'permissions': { 'admin': false }, 'role_ids': [1] }],
+        'bookings': [{ 'id': 1, 'start_at': tomorrow, 'end_at': nextWeek, 'days': 2, 'price': 20, 'user_id': user.id, 'rental_id': 1 }],
+        'rentals': [{ 'id': 1, 'name': 'Abshire LLC', 'daily_rate': 10, 'user_id': 1, 'busy_days': [busyDay1] }],
+        'users': [{ 'id': user.id, 'email': user.email, 'admin': user.admin, 'role_ids': [1] }],
         'roles': [{ 'id': 1, 'name': 'user' }]
       };
     });
@@ -161,7 +165,7 @@ define('bs-client/tests/acceptance/bookings-list-test', ['qunit', 'bs-client/tes
     (0, _emberSimpleAuth.authenticateSession)(this.application, { user_id: user.id });
 
     server.get('/users/me', function () {
-      return { user: user, permissions: { 'admin': false } };
+      return { user: user };
     });
 
     visit('/bookings');
@@ -192,10 +196,16 @@ define('bs-client/tests/acceptance/login-test', ['qunit', 'bs-client/tests/helpe
 
   (0, _qunit.test)('visiting /login', function (assert) {
     server.post('/user_sessions.json', function (db, request) {
-      assert.equal(request.params.session.email, 'email_0@example.com', 'email does not match the expected one');
-      assert.equal(request.params.session.password, 'password_0', 'password does not match the expected one');
+      if (request.params.session) {
+        assert.equal(request.params.session.email, 'email_0@example.com', 'email does not match the expected one');
+        assert.equal(request.params.session.password, 'password_0', 'password does not match the expected one');
+      }
 
-      return db.user_sessions.create();
+      return { 'user': { 'id': 2, 'email': 'admin@adrian-bs.com', 'admin': true, 'role_ids': [2] }, 'session': { 'id': 7, 'access_token': '2123a309fe681eab365b419aa7aa3b94', 'accessed_at': '2017-11-26', 'revoked_at': null, 'created_at': '2017-11-26T10:46:43.514Z' } };
+    });
+
+    server.get('/users/me', function () {
+      return {};
     });
 
     visit('/');
@@ -236,7 +246,7 @@ define('bs-client/tests/acceptance/rentals-list-test', ['qunit', 'bs-client/test
     server.get('/rentals', function () {
       return {
         'rentals': [{ 'id': 1, 'name': 'Rental sample name', 'daily_rate': 5.50, 'user_id': normalUser.id }, { 'id': 2, 'name': 'Rental sample name 2', 'daily_rate': 10.10, 'user_id': adminUser.id }],
-        'users': [{ 'id': normalUser.id, 'email': normalUser.email, 'admin': normalUser.admin, 'permissions': { 'admin': false }, 'role_ids': [1] }, { 'id': adminUser.id, 'email': adminUser.email, 'admin': adminUser.admin, 'permissions': { 'admin': true }, 'role_ids': [2] }],
+        'users': [{ 'id': normalUser.id, 'email': normalUser.email, 'admin': normalUser.admin, 'role_ids': [1] }, { 'id': adminUser.id, 'email': adminUser.email, 'admin': adminUser.admin, 'role_ids': [2] }],
         'roles': [{ 'id': 1, 'name': 'user' }, { 'id': 2, 'name': 'admin' }]
       };
     });
@@ -254,10 +264,7 @@ define('bs-client/tests/acceptance/rentals-list-test', ['qunit', 'bs-client/test
     });
 
     server.get('/users/me', function () {
-      return {
-        user: adminUser,
-        permissions: { 'admin': true }
-      };
+      return { user: adminUser };
     });
 
     visit('/rentals');
@@ -279,7 +286,7 @@ define('bs-client/tests/acceptance/rentals-list-test', ['qunit', 'bs-client/test
     server.get('/rentals', function () {
       return {
         'rentals': [{ 'id': 1, 'name': 'Rental sample name', 'daily_rate': 5.50, 'user_id': adminUser.id }, { 'id': 2, 'name': 'Rental sample name 2', 'daily_rate': 10.10, 'user_id': normalUser.id }],
-        'users': [{ 'id': normalUser.id, 'email': normalUser.email, 'admin': normalUser.admin, 'permissions': { 'admin': false }, 'role_ids': [1] }, { 'id': adminUser.id, 'email': adminUser.email, 'admin': adminUser.admin, 'permissions': { 'admin': true }, 'role_ids': [2] }],
+        'users': [{ 'id': normalUser.id, 'email': normalUser.email, 'admin': normalUser.admin, 'role_ids': [1] }, { 'id': adminUser.id, 'email': adminUser.email, 'admin': adminUser.admin, 'role_ids': [2] }],
         'roles': [{ 'id': 1, 'name': 'user' }, { 'id': 2, 'name': 'admin' }]
       };
     });
@@ -287,7 +294,7 @@ define('bs-client/tests/acceptance/rentals-list-test', ['qunit', 'bs-client/test
     (0, _emberSimpleAuth.authenticateSession)(this.application, { user_id: normalUser.id });
 
     server.get('/users/me', function () {
-      return { user: normalUser, permissions: { 'admin': false } };
+      return { user: normalUser };
     });
 
     visit('/rentals');
@@ -309,7 +316,7 @@ define('bs-client/tests/acceptance/rentals-list-test', ['qunit', 'bs-client/test
     server.get('/rentals', function () {
       return {
         'rentals': [{ 'id': 1, 'name': 'Rental sample name', 'daily_rate': 5.50, 'user_id': normalUser2.id }, { 'id': 2, 'name': 'Rental sample name 2', 'daily_rate': 10.10, 'user_id': adminUser.id }],
-        'users': [{ 'id': normalUser.id, 'email': normalUser.email, 'admin': normalUser.admin, 'permissions': { 'admin': false }, 'role_ids': [1] }, { 'id': normalUser2.id, 'email': normalUser2.email, 'admin': normalUser2.admin, 'permissions': { 'admin': false }, 'role_ids': [1] }, { 'id': adminUser.id, 'email': adminUser.email, 'admin': adminUser.admin, 'permissions': { 'admin': true }, 'role_ids': [2] }],
+        'users': [{ 'id': normalUser.id, 'email': normalUser.email, 'admin': normalUser.admin, 'role_ids': [1] }, { 'id': normalUser2.id, 'email': normalUser2.email, 'admin': normalUser2.admin, 'role_ids': [1] }, { 'id': adminUser.id, 'email': adminUser.email, 'admin': adminUser.admin, 'role_ids': [2] }],
         'roles': [{ 'id': 1, 'name': 'user' }, { 'id': 2, 'name': 'admin' }]
       };
     });
@@ -317,7 +324,7 @@ define('bs-client/tests/acceptance/rentals-list-test', ['qunit', 'bs-client/test
     (0, _emberSimpleAuth.authenticateSession)(this.application, { user_id: normalUser.id });
 
     server.get('/users/me', function () {
-      return { user: normalUser, permissions: { 'admin': false } };
+      return { user: normalUser };
     });
 
     visit('/rentals');
@@ -339,8 +346,8 @@ define('bs-client/tests/acceptance/rentals-list-test', ['qunit', 'bs-client/test
 
     server.get('/rentals', function () {
       return {
-        'rentals': [{ 'id': 1, 'name': 'Rental sample name', 'daily_rate': 99.49, 'user_id': 1 }],
-        'users': [{ 'id': 1, 'email': user.email, 'admin': user.admin, 'permissions': { 'admin': false }, 'role_ids': [1] }],
+        'rentals': [{ 'id': 1, 'name': 'Rental sample name', 'daily_rate': 99.49, 'user_id': user.id }],
+        'users': [{ 'id': user.id, 'email': user.email, 'admin': user.admin, 'role_ids': [1] }],
         'roles': [{ 'id': 1, 'name': 'user' }]
       };
     });
@@ -348,7 +355,7 @@ define('bs-client/tests/acceptance/rentals-list-test', ['qunit', 'bs-client/test
     (0, _emberSimpleAuth.authenticateSession)(this.application, { user_id: user.id });
 
     server.get('/users/me', function () {
-      return { user: user, permissions: { 'admin': false } };
+      return { user: user };
     });
 
     visit('/rentals');
@@ -364,6 +371,44 @@ define('bs-client/tests/acceptance/rentals-list-test', ['qunit', 'bs-client/test
       assert.equal(find('[data-test-rental-new-dialog]').length, 1, 'User should see edit dialog');
       assert.equal(find('[data-test-rental-new-dialog-name-input]').length, 1, 'User should see name input');
       assert.equal(find('[data-test-rental-new-dialog-name-input]').val(), 'Rental sample name', 'Name should be loaded');
+    });
+  });
+
+  (0, _qunit.test)('book a rental', function (assert) {
+    var user = server.create('user', 'normalUser');
+    var user2 = server.create('user', 'normalUser');
+    var tomorrow = moment(new Date()).add(1, 'days');
+    var after3Days = tomorrow.add(2, 'days');
+
+    server.get('/rentals', function () {
+      return {
+        'rentals': [{ 'id': 1, 'name': 'Rental sample name', 'daily_rate': 99.49, 'user_id': user2.id, 'busy_days': [tomorrow.format('YYYY-MM-DD'), after3Days.format('YYYY-MM-DD')] }],
+        'users': [{ 'id': user2.id, 'email': user2.email, 'admin': user2.admin, 'role_ids': [1] }],
+        'roles': [{ 'id': 1, 'name': 'user' }]
+      };
+    });
+
+    (0, _emberSimpleAuth.authenticateSession)(this.application, { user_id: user.id });
+
+    server.get('/users/me', function () {
+      return { user: user };
+    });
+
+    visit('/rentals');
+
+    andThen(function () {
+      assert.equal(find('[data-test-rental-book-btn]').length, 1, 'User should see book button');
+    });
+
+    click('[data-test-rental-book-btn]');
+
+    andThen(function () {
+      assert.equal(currentURL(), '/rentals/' + 1 + '/book');
+      assert.equal(find('[data-test-booking-new-dialog]').length, 1, 'User should see booking dialog');
+      assert.equal(find('[data-test-booking-form-rental-name-input]').length, 1, 'User should see rental input');
+      assert.equal(find('[data-test-booking-dialog-from-date-div] input').length, 1, 'User should see \'from date\' input');
+      assert.equal(find('[data-test-booking-dialog-to-date-div] input').length, 1, 'User should see \'to date\' input');
+      // assert.equal(find('[data-test-booking-form-rental-name-input]').val(), 'Rental sample name', 'Rental name should be preloaded');
     });
   });
 });

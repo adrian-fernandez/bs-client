@@ -196,6 +196,5 @@ test('book a rental', function(assert) {
     assert.equal(find('[data-test-booking-form-rental-name-input]').length, 1, 'User should see rental input');
     assert.equal(find('[data-test-booking-dialog-from-date-div] input').length, 1, 'User should see \'from date\' input');
     assert.equal(find('[data-test-booking-dialog-to-date-div] input').length, 1, 'User should see \'to date\' input');
-    // assert.equal(find('[data-test-booking-form-rental-name-input]').val(), 'Rental sample name', 'Rental name should be preloaded');
   });
 });

@@ -13,7 +13,7 @@ sign_up:
   first_name: First name
   last_name: Last name
   email: Email
-  password: password
+  password: Password
   confirm_password: Confirm Password
   cta: Create my account
   created: Your account was successfully saved

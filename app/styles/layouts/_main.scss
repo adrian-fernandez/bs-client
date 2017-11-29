@@ -13,6 +13,10 @@ ul {
   padding: 6px 20px;
 }
 
+.input-group .input-group-addon input {
+  height: 30px !important;
+}
+
 .btn-group {
   .btn {
     border-radius: 0;
@@ -89,7 +93,6 @@ input[type="email"],
 input[type="number"],
 input[type="text"],
 input[type="password"] {
-  padding: 2px;
   padding-left: 10px;
   border: solid 1px #dcdcdc;
   transition: box-shadow 0.3s, border 0.3s;

@@ -27,8 +27,7 @@ module.exports = function(environment) {
       allowEmpty: true // default: false
     },
 
-    // BACKEND_URL: process.env.BACKEND_URL
-    BACKEND_URL: 'http://localhost:3000'
+    BACKEND_URL: process.env.BACKEND_URL
   };
 
   if (environment === 'development' || environment === 'production') {

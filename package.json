@@ -26,7 +26,7 @@
     "ember-cli-bootstrap-datepicker": "0.5.6",
     "ember-cli-clipboard": "^0.8.0",
     "ember-cli-cookie": "^0.2.0",
-    "ember-cli-dotenv": "^1.2.0",
+    "ember-cli-dotenv": "^2.0.0",
     "ember-cli-head": "0.3.1",
     "ember-cli-inline-content": "^0.4.0",
     "ember-cli-moment-shim": "3.4.0",

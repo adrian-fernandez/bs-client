@@ -1,37 +1,43 @@
-<div class="auth">
-  <div class="auth-form int-sign-up-form">
-    <div class="auth-center">
-      <h2>{{t 'sign_up.header'}}</h2>
-
-      <div class="form-item">
-        {{input type="email" placeholder=(t 'sign_up.email') value=model.email enter='signup'}}
-      </div>
-
-      <div class="form-item">
-        {{input type="password" placeholder=(t 'sign_up.password') value=model.password enter='signup'}}
-      </div>
-
-      <div class="form-item">
-        {{input type="password" placeholder=(t 'sign_up.confirm_password') value=model.passwordConfirmation enter='signup'}}
-      </div>
-
-      <div class="auth-actions">
-        <a class="button button-outline button-block int-sign-up-button" {{action 'signup'}}>
-          {{t 'sign_up.cta'}} <span class="ion-android-arrow-forward"></span>
-        </a>
-        {{#link-to 'landing' class="auth-forgot"}}
-          {{t 'sign_up.already_have_account'}}
-          {{t 'landing.login'}}
-        {{/link-to}}
-      </div>
+<div id="loginbox" style="margin-top:50px;" class="mainbox col-md-8 col-md-offset-2">
+  <div class="panel panel-info">
+    <div class="panel-heading">
+      <div class="panel-title">{{t 'sign_up.header'}}</div>
     </div>
 
-    <ul class="auth-links">
-      <li>{{t 'landing.built_by'}}</li>
-      <li><a href="#" title="{{t 'landing.terms_conds'}}" {{action 'toggleTerms'}}>{{t 'landing.terms_conds'}}</a></li>
-      <li><a href="#" title="{{t 'landing.privacy_policy'}}" {{action 'togglePrivacyPolicy'}}>{{t 'landing.privacy_policy'}}</a></li>
-      <li>{{client.address}}</li>
-      <li>{{client.vat}}</li>
-    </ul>
+    <div class="panel-body">
+        <form {{action 'create' on='submit' class="form-horizontal"}}>
+          <div style="margin-bottom: 25px" class="input-group">
+            <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+            {{input data-test-signin-email-field type="email" id='email' class="form-control" placeholder=(t 'landing.enter_email') value=user.email autofocus='autofocus' enter='authenticate'}}
+          </div>
+
+          <div style="margin-bottom: 25px" class="input-group">
+            <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+            {{input type="password" placeholder=(t 'sign_up.password') value=user.password class="form-control"}}
+          </div>
+
+          <div style="margin-bottom: 25px" class="input-group">
+            <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+            {{input type="password" placeholder=(t 'sign_up.confirm_password') value=user.passwordConfirmation class="form-control"}}
+          </div>
+
+          <div style="margin-top:10px" class="form-group">
+            <div class="col-sm-12 controls">
+              <a class="btn btn-success" {{action 'signup'}}>{{t 'sign_up.cta'}} <span class="ion-android-arrow-forward"></span></a>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="col-md-12 control">
+              <div style="border-top: 1px solid#888; padding-top:15px; font-size:85%">
+                {{#link-to 'landing' class="auth-forgot"}}
+                  {{t 'sign_up.already_have_account'}}
+                  {{t 'landing.login'}}
+                {{/link-to}}
+              </div>
+            </div>
+          </div>
+        </form>
+    </div>
   </div>
 </div>

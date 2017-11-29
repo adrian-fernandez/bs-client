@@ -11,12 +11,12 @@ export default Ember.Route.extend(CurrentUser, ErrorGenerator, {
   setupController(controller) {
     const user = this.store.createRecord('user', { } );
 
-    controller.set('model', user);
+    controller.set('user', user);
   },
 
   actions: {
     signup() {
-      const user = this.get('controller.model');
+      const user = this.get('controller.user');
 
       var valid = (user) => {
         const email = user.get('email');

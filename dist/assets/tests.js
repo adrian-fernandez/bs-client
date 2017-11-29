@@ -408,7 +408,6 @@ define('bs-client/tests/acceptance/rentals-list-test', ['qunit', 'bs-client/test
       assert.equal(find('[data-test-booking-form-rental-name-input]').length, 1, 'User should see rental input');
       assert.equal(find('[data-test-booking-dialog-from-date-div] input').length, 1, 'User should see \'from date\' input');
       assert.equal(find('[data-test-booking-dialog-to-date-div] input').length, 1, 'User should see \'to date\' input');
-      // assert.equal(find('[data-test-booking-form-rental-name-input]').val(), 'Rental sample name', 'Rental name should be preloaded');
     });
   });
 });
@@ -474,7 +473,7 @@ define('bs-client/tests/app.lint-test', [], function () {
 
   QUnit.test('components/x-login-form.js', function (assert) {
     assert.expect(1);
-    assert.ok(true, 'components/x-login-form.js should pass ESLint\n\n');
+    assert.ok(false, 'components/x-login-form.js should pass ESLint\n\n2:8 - \'ENV\' is defined but never used. (no-unused-vars)');
   });
 
   QUnit.test('components/x-navigation.js', function (assert) {

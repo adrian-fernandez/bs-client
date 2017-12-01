@@ -1325,7 +1325,7 @@ define('bs-client/components/x-loading', ['exports'], function (exports) {
     })
   });
 });
-define('bs-client/components/x-login-form', ['exports', 'bs-client/config/environment'], function (exports, _environment) {
+define('bs-client/components/x-login-form', ['exports'], function (exports) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -6800,6 +6800,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("bs-client/app")["default"].create({"LOG_TRANSITIONS":true,"LOG_TRANSITIONS_INTERNAL":true,"name":"bs-client","version":"0.0.0+6b17e866"});
+  require("bs-client/app")["default"].create({"LOG_TRANSITIONS":true,"LOG_TRANSITIONS_INTERNAL":true,"name":"bs-client","version":"0.0.0+17809d9c"});
 }
 //# sourceMappingURL=bs-client.map

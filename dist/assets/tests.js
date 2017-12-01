@@ -473,7 +473,7 @@ define('bs-client/tests/app.lint-test', [], function () {
 
   QUnit.test('components/x-login-form.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'components/x-login-form.js should pass ESLint\n\n2:8 - \'ENV\' is defined but never used. (no-unused-vars)');
+    assert.ok(true, 'components/x-login-form.js should pass ESLint\n\n');
   });
 
   QUnit.test('components/x-navigation.js', function (assert) {

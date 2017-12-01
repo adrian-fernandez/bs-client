@@ -18,6 +18,14 @@ You will need the following things properly installed on your computer.
 * `cd bs-client`
 * `npm install`
 
+## Setup
+
+* In order to connect with backend server you need to create `.env` file in the root folder with `BACKEND_URL` key
+Example:
+```console
+BACKEND_URL=http://localhost:3000
+```
+
 ## Running / Development
 
 * `ember serve`
